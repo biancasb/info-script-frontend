@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import GraduationIconImg from "../../assets/icons/graduation.svg";
 import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
@@ -36,6 +39,9 @@ import {
 
 const Profile: React.FC = () => {
   const [likedById, setLikedById] = useState<Record<number, boolean>>({});
+  const { username } = useParams();
+  const currentUserUsername = "bianca";
+  const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername;
 
   const toggleLike = (id: number) => {
     setLikedById((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -83,8 +89,10 @@ const Profile: React.FC = () => {
               </GraduationIcon>
               <ProfileSubtitle>Ingresso em 2020, UFCSPA.</ProfileSubtitle>
             </ProfileSubtitleRow>
-          </ProfileInfo>
-          <FollowButton>+ Seguir</FollowButton>
+            </ProfileInfo>
+            {!isOwnProfile && (
+              <FollowButton>+ Seguir</FollowButton>
+            )}
         </ProfileHeaderSection>
 
         <AboutSection>
@@ -130,15 +138,11 @@ const Profile: React.FC = () => {
                   data-liked={likedById[pub.id] ? "true" : "false"}
                   onClick={() => toggleLike(pub.id)}
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 21s-1-.6-2.3-1.7C7 17.5 4 15 4 11.5 4 9 5.9 7 8.4 7c1.4 0 2.7.7 3.6 1.8C12.9 7.7 14.2 7 15.6 7 18.1 7 20 9 20 11.5c0 3.5-3 6-5.7 7.8C13 20.4 12 21 12 21z"/>
-                  </svg>
+                  {likedById[pub.id] ? (
+                    <FavoriteIcon fontSize="small" />
+                  ) : (
+                    <FavoriteBorderIcon fontSize="small" />
+                  )}
                 </LikeButton>
                 <AuthorTag>- {pub.author}</AuthorTag>
               </PublicationFooter>

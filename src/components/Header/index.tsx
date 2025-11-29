@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
                 style={{ width: 18, height: 18, display: "block" }}
               />
             </SearchIcon>
-            <SearchInput placeholder="Buscar pela tag" />
+            <SearchInput placeholder="Buscar" />
           </SearchBar>
         </TopBarLeft>
 
