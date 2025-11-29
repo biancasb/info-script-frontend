@@ -10,16 +10,16 @@ export const FeedWrapper = styled.div`
 
 export const TopBar = styled.header`
   width: 100%;
-  padding-top: ${Layout.normalize(16)}px;
+  padding: ${Layout.normalize(8)}px 0;
   display: flex;
   justify-content: center;
 `;
 
 export const TopBarContent = styled.div`
-  max-width: 1200px;
   width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  background: #305a93;
+  background: #5FA5CE;
   border-radius: ${Layout.normalize(24)}px;
   padding: 0 ${Layout.normalize(24)}px; /* sem padding vertical → barra mais fina */
   display: flex;
@@ -34,9 +34,58 @@ export const TopBarLeft = styled.div`
   gap: ${Layout.normalize(16)}px;
 `;
 
+export const TopBarCenter = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 ${Layout.normalize(16)}px;
+`;
+
+export const SearchBar = styled.div`
+  width: 100%;
+  max-width: 520px;
+  height: ${Layout.normalize(44)}px;
+  background: ${Colors.commonWhite};
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 0 ${Layout.normalize(16)}px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+`;
+
+export const SearchIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: ${Layout.normalize(18)}px;
+  height: ${Layout.normalize(18)}px;
+  color: ${Colors.infoScriptTextInverse};
+  margin-right: ${Layout.normalize(10)}px;
+  
+  img {
+    display: block;
+    opacity: 0.6;
+  }
+`;
+
+export const SearchInput = styled.input`
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: ${Layout.normalize(14)}px;
+  font-family: ${Typography.fontFamilyRegular};
+  color: ${Colors.infoScriptTextPrimary};
+
+  &::placeholder {
+    color: ${Colors.infoScriptTextInverse};
+  }
+`;
+
 export const TopBarRight = styled.div`
   display: flex;
   align-items: center;
+  gap: ${Layout.normalize(12)}px;
 `;
 
 export const LogoWrapper = styled.div`
@@ -45,14 +94,11 @@ export const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: ${Layout.normalize(140)}px;
-  height: ${Layout.normalize(80)}px;
-
+  width: ${Layout.normalize(150)}px;
+  height: ${Layout.normalize(75)}px;
   overflow: hidden;
   margin-left: -30px;
 `;
-
 
 export const LogoImage = styled.img`
   width: 50%;
@@ -144,18 +190,45 @@ export const UserAvatarBig = styled.div`
   justify-content: center;
   font-family: ${Typography.fontFamilyBold};
   font-size: ${Layout.normalize(22)}px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 export const UserName = styled.div`
   font-family: ${Typography.fontFamilyBold};
   font-size: ${Layout.normalize(16)}px;
-  color: ${Colors.infoScriptTextPrimary};
+  color: ${Colors.infoScriptPrimary};
+`;
+
+export const UserSubtitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${Layout.normalize(6)}px;
 `;
 
 export const UserSubtitle = styled.div`
   font-family: ${Typography.fontFamilyRegular};
   font-size: ${Layout.normalize(13)}px;
-  color: ${Colors.infoScriptTextSecondary};
+  color: ${Colors.infoScriptPrimary};
+`;
+
+export const GraduationIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: ${Layout.normalize(16)}px;
+  height: ${Layout.normalize(16)}px;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 `;
 
 export const UserMeta = styled.div`

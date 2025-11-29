@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import infoScriptLogo from "./assets/images/infoScript.png";
+import logoGoogle from "./assets/images/logo_google.png";
 import Feed from "./screen/Feed";
 type AuthMode = "login" | "register";
 
@@ -99,7 +100,7 @@ const PrimaryButton = styled.button`
   margin-top: 8px;
   border-radius: 999px;
   border: 1px solid #1787c8;
-  background: #1787c8;
+  background: #5FA5CE;
   color: #ffffff;
   padding: 10px 16px;
   font-size: 15px;
@@ -109,7 +110,7 @@ const PrimaryButton = styled.button`
     transform 0.05s ease;
 
   &:hover {
-    background: #11689a;
+    background: #5FA5CE;
     box-shadow: 0 12px 24px rgba(23, 135, 200, 0.32);
     transform: translateY(-1px);
   }
@@ -167,13 +168,19 @@ const GoogleIcon = styled.span`
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  background: conic-gradient(
-    from 0deg,
-    #ea4335 0deg 90deg,
-    #fbbc05 90deg 180deg,
-    #34a853 180deg 270deg,
-    #4285f4 270deg 360deg
-  );
+  padding: 2px; /* ring thickness */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  img {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    background: #ffffff;
+  }
 `;
 
 const SwitchText = styled.div`
@@ -184,7 +191,7 @@ const SwitchText = styled.div`
 `;
 
 const LinkText = styled.span`
-  color: #1787c8;
+  color: #5FA5CE;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -265,7 +272,9 @@ const App: React.FC = () => {
             </Divider>
 
             <GoogleButton type="button" onClick={handleGoogleClick}>
-              <GoogleIcon />
+              <GoogleIcon>
+                <img src={logoGoogle} alt="Google logo" />
+              </GoogleIcon>
               <span>Sign in with Google</span>
             </GoogleButton>
 
