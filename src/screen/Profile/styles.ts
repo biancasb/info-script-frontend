@@ -355,16 +355,10 @@ export const LikeButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  color: ${Colors.infoScriptPrimary};
 
-  svg path {
-    fill: transparent;
-    stroke: ${Colors.infoScriptPrimary};
-    stroke-width: 2;
-  }
-
-  &[data-liked="true"] svg path {
-    fill: #305a93; /* azul escuro da paleta */
-    stroke: #305a93;
+  &[data-liked="true"] {
+    color: #305a93;
   }
 
   &:hover {

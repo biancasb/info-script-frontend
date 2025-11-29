@@ -186,6 +186,13 @@ export const UserCard = styled.div`
 export const UserCardHeader = styled.div`
   display: flex;
   gap: ${Layout.normalize(12)}px;
+  align-items: center; /* centraliza verticalmente avatar e bloco de infos */
+`;
+
+export const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centraliza verticalmente nome + subtítulo */
 `;
 
 export const UserAvatarBig = styled.div`
@@ -295,6 +302,44 @@ export const ComposerTagsRow = styled.div`
   gap: ${Layout.normalize(8)}px;
   margin-bottom: ${Layout.normalize(12)}px;
   flex-wrap: wrap;
+`;
+
+export const ComposerLinksRow = styled.div`
+  display: flex;
+  gap: ${Layout.normalize(8)}px;
+  margin-bottom: ${Layout.normalize(12)}px;
+  flex-wrap: wrap;
+  align-items: center;
+`;
+
+export const ComposerLinkInput = styled.input`
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
+  font-size: ${Layout.normalize(12)}px;
+  font-family: ${Typography.fontFamilyRegular};
+  color: ${Colors.infoScriptTextPrimary};
+  width: 280px;
+
+  &::placeholder {
+    color: ${Colors.infoScriptTextSecondary};
+  }
+`;
+
+export const LinkBadge = styled.a`
+  border-radius: 999px;
+  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
+  border: 1px solid #e5e7eb;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(12)}px;
+  text-decoration: none;
+  color: ${Colors.infoScriptTextPrimary};
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #f3f4f6;
+  }
 `;
 
 interface ComposerTagFakeProps {

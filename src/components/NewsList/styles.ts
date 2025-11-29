@@ -54,9 +54,17 @@ export const ItemMeta = styled.span`
 
 export const Thumb = styled.img`
   width: 100%;
-  height: ${Layout.normalize(120)}px;
-  border-radius: ${Layout.normalize(8)}px;
+  aspect-ratio: 16 / 9;
+  border-radius: ${Layout.normalize(12)}px;
   object-fit: cover;
-  background: #f3f4f6;
+  background: #e2e8f0;
   margin-bottom: ${Layout.normalize(8)}px;
+  display: block;
+`;
+
+export const ItemExcerpt = styled.p`
+  margin: ${Layout.normalize(6)}px 0 0;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(13)}px;
+  color: ${Colors.infoScriptTextPrimary};
 `;

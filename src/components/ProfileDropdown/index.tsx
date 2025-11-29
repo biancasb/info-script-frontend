@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ProfileButton,
   ProfileAvatar,
@@ -19,6 +19,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -45,6 +46,11 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName }) => {
     navigate("/profile");
   };
 
+  const handleFeed = () => {
+    setIsOpen(false);
+    navigate("/feed");
+  };
+
   const handleLogout = () => {
     setIsOpen(false);
     // Limpar dados de autenticação se necessário
@@ -65,7 +71,14 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName }) => {
 
       {isOpen && (
         <DropdownMenu>
-          <DropdownItem onClick={handleProfile}>Perfil</DropdownItem>
+          {/* Show Feed option unless already on /feed */}
+          {location.pathname !== "/feed" && (
+            <DropdownItem onClick={handleFeed}>Feed</DropdownItem>
+          )}
+          {/* Show Perfil unless on own profile (/profile). If viewing another profile (/profile/algum) show Perfil */}
+          {location.pathname !== "/profile" && (
+            <DropdownItem onClick={handleProfile}>Perfil</DropdownItem>
+          )}
           <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
         </DropdownMenu>
       )}

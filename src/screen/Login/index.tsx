@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoInfo from "../../assets/images/icone-InfoScript.png";
+import LogoInfo from "../../assets/images/InfoScript.png";
 
 import {
   LoginWrapper,
   LoginCard,
   LogoSection,
   LogoImage,
-  AppTitle,
   FormSection,
-  FormTitle,
   InputGroup,
   Label,
   Input,
@@ -54,11 +52,9 @@ const Login: React.FC = () => {
       <LoginCard>
         <LogoSection>
           <LogoImage src={LogoInfo} alt="InfoScript Logo" />
-          <AppTitle>InfoScript</AppTitle>
         </LogoSection>
 
         <FormSection>
-          <FormTitle>Entrar</FormTitle>
           <GoogleButton type="button" onClick={handleGoogleLogin}>
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
