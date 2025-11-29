@@ -1,25 +1,14 @@
 import React, { useState } from "react";
-import LogoInfo from "../../assets/images/icone-InfoScript.png";
+import Header from "../../components/Header";
+import PageContainer from "../../components/PageContainer";
+import AppAvatar from "../../components/Avatar";
+import NewsList from "../../components/NewsList";
 import GithubIcon from "../../assets/images/github-mark.png";
 import PdfIcon from "../../assets/images/pdf.png";
-import SearchIconImg from "../../assets/icons/search.svg";
 import GraduationIconImg from "../../assets/icons/graduation.svg";
 
 import {
   FeedWrapper,
-  TopBar,
-  TopBarContent,
-  SearchBar,
-  SearchIcon,
-  SearchInput,
-  TopBarLeft,
-  TopBarRight,
-  LogoWrapper,
-  LogoImage,
-  ProfileButton,
-  ProfileAvatar,
-  ProfileInfo,
-  ProfileName,
   LayoutWrapper,
   LeftColumn,
   CenterColumn,
@@ -115,43 +104,14 @@ const Feed: React.FC = () => {
 
   return (
     <FeedWrapper>
-      <TopBar>
-        <TopBarContent>
-          
-          <TopBarLeft>
-            <LogoWrapper>
-              <LogoImage src={LogoInfo} alt="InfoScript Logo" />
-            </LogoWrapper>
-
-            <SearchBar>
-              <SearchIcon>
-                <img src={SearchIconImg} alt="Buscar" style={{ width: 18, height: 18, display: 'block' }} />
-              </SearchIcon>
-              <SearchInput placeholder="Buscar pela tag" />
-            </SearchBar>
-          </TopBarLeft>
-
-          <TopBarRight>
-            <ProfileButton>
-              <ProfileAvatar>B</ProfileAvatar>
-              <ProfileInfo>
-                <ProfileName>Bianca Siega</ProfileName>
-              </ProfileInfo>
-            </ProfileButton>
-          </TopBarRight>
-
-        </TopBarContent>
-      </TopBar>
-
-
+      <Header />
+      <PageContainer>
       <LayoutWrapper>
         <LeftColumn>
           <UserCard>
             <UserCardHeader>
               <UserAvatarBig>
-                {/* Substitua pelo caminho da sua foto */}
-                {/* <img src={ProfilePhoto} alt="Bianca Siega" /> */}
-                B
+                <AppAvatar name="Bianca Siega" size={56} />
               </UserAvatarBig>
               <div>
                 <UserName>Bianca Siega</UserName>
@@ -219,7 +179,7 @@ const Feed: React.FC = () => {
             <PostCard key={post.id}>
               <PostHeader>
                 <PostAvatarSmall>
-                  {post.author.charAt(0).toUpperCase()}
+                  <AppAvatar name={post.author} size={36} />
                 </PostAvatarSmall>
                 <PostHeaderInfo>
                   <PostHeaderName>{post.author}</PostHeaderName>
@@ -277,9 +237,11 @@ const Feed: React.FC = () => {
         <RightColumn>
           <NewsCard>
             <NewsTitle>Notícias</NewsTitle>
+            <NewsList />
           </NewsCard>
         </RightColumn>
       </LayoutWrapper>
+      </PageContainer>
     </FeedWrapper>
   );
 };

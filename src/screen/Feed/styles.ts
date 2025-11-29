@@ -17,11 +17,12 @@ export const TopBar = styled.header`
 
 export const TopBarContent = styled.div`
   width: 100%;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   background: #5FA5CE;
   border-radius: ${Layout.normalize(24)}px;
-  padding: 0 ${Layout.normalize(24)}px; /* sem padding vertical → barra mais fina */
+  padding: 0 ${Layout.normalize(24)}px;
+  height: ${Layout.normalize(75)}px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -149,7 +150,7 @@ export const ProfileName = styled.span`
 export const LayoutWrapper = styled.main`
   max-width: 1200px;
   width: 100%;
-  margin: ${Layout.normalize(24)}px auto;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr) 260px;
   gap: ${Layout.normalize(20)}px;
@@ -165,7 +166,15 @@ export const LayoutWrapper = styled.main`
 
 export const LeftColumn = styled.section``;
 export const CenterColumn = styled.section``;
-export const RightColumn = styled.section``;
+export const RightColumn = styled.section`
+  position: sticky;
+  top: ${Layout.normalize(24)}px;
+  align-self: flex-start;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
 
 export const UserCard = styled.div`
   background: ${Colors.commonWhite};
@@ -183,19 +192,17 @@ export const UserAvatarBig = styled.div`
   width: ${Layout.normalize(56)}px;
   height: ${Layout.normalize(56)}px;
   border-radius: 999px;
-  background: ${Colors.infoScriptPrimarySoft};
-  color: ${Colors.infoScriptPrimary};
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(22)}px;
   overflow: hidden;
   
-  img {
+  img, svg {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    border-radius: 50%;
+    display: block;
   }
 `;
 
@@ -377,11 +384,17 @@ export const PostAvatarSmall = styled.div`
   width: ${Layout.normalize(40)}px;
   height: ${Layout.normalize(40)}px;
   border-radius: 999px;
-  background: ${Colors.infoScriptPrimarySoft};
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ${Typography.fontFamilyBold};
+  
+  img, svg {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: block;
+  }
 `;
 
 export const PostHeaderInfo = styled.div`
