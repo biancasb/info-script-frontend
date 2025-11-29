@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import LogoInfo from "../../assets/images/icone-InfoScript.png";
 import GithubIcon from "../../assets/images/github-mark.png";
 import PdfIcon from "../../assets/images/pdf.png";
+import SearchIconImg from "../../assets/icons/search.svg";
+import GraduationIconImg from "../../assets/icons/graduation.svg";
 
 import {
   FeedWrapper,
   TopBar,
   TopBarContent,
+  SearchBar,
+  SearchIcon,
+  SearchInput,
   TopBarLeft,
   TopBarRight,
   LogoWrapper,
@@ -23,7 +28,9 @@ import {
   UserCardHeader,
   UserAvatarBig,
   UserName,
+  UserSubtitleRow,
   UserSubtitle,
+  GraduationIcon,
   UserMeta,
   TagsWrapper,
   TagPill,
@@ -110,11 +117,18 @@ const Feed: React.FC = () => {
     <FeedWrapper>
       <TopBar>
         <TopBarContent>
+          
           <TopBarLeft>
             <LogoWrapper>
               <LogoImage src={LogoInfo} alt="InfoScript Logo" />
             </LogoWrapper>
 
+            <SearchBar>
+              <SearchIcon>
+                <img src={SearchIconImg} alt="Buscar" style={{ width: 18, height: 18, display: 'block' }} />
+              </SearchIcon>
+              <SearchInput placeholder="Buscar pela tag" />
+            </SearchBar>
           </TopBarLeft>
 
           <TopBarRight>
@@ -125,17 +139,28 @@ const Feed: React.FC = () => {
               </ProfileInfo>
             </ProfileButton>
           </TopBarRight>
+
         </TopBarContent>
       </TopBar>
+
 
       <LayoutWrapper>
         <LeftColumn>
           <UserCard>
             <UserCardHeader>
-              <UserAvatarBig>B</UserAvatarBig>
+              <UserAvatarBig>
+                {/* Substitua pelo caminho da sua foto */}
+                {/* <img src={ProfilePhoto} alt="Bianca Siega" /> */}
+                B
+              </UserAvatarBig>
               <div>
                 <UserName>Bianca Siega</UserName>
-                <UserSubtitle>Ingresso em 2019</UserSubtitle>
+                <UserSubtitleRow>
+                  <GraduationIcon>
+                    <img src={GraduationIconImg} alt="Graduação" />
+                  </GraduationIcon>
+                  <UserSubtitle>Ingresso em 2019</UserSubtitle>
+                </UserSubtitleRow>
                 <UserMeta>Quality Assurance Engineer - Grupo Panvel</UserMeta>
               </div>
             </UserCardHeader>

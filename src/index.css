@@ -163,19 +163,6 @@ body {
   transform: translateY(-1px);
 }
 
-.auth-google-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: conic-gradient(
-    from 0deg,
-    #ea4335 0deg 90deg,
-    #fbbc05 90deg 180deg,
-    #34a853 180deg 270deg,
-    #4285f4 270deg 360deg
-  );
-}
-
 
 .auth-switch-text {
   margin-top: 24px;
