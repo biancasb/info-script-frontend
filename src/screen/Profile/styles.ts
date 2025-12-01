@@ -261,6 +261,13 @@ export const TagLabel = styled.span`
   font-family: ${Typography.fontFamilyRegular};
   font-size: ${Layout.normalize(13)}px;
   border: 1px solid #d1e5f0;
+  cursor: pointer;
+  user-select: none;
+
+  &[data-selected="true"] {
+    background: #d1e5f0;
+    border-color: #9fc1d6;
+  }
 `;
 
 export const TagPill = styled.span`
@@ -302,10 +309,7 @@ export const PublicationCard = styled.div`
     transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
-
-  &:nth-child(3) {
-    border-color: #4a7ba7;
-  }
+  
 `;
 
 export const PublicationImage = styled.img`

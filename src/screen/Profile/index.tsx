@@ -6,6 +6,7 @@ import GraduationIconImg from "../../assets/icons/graduation.svg";
 import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
+import Footer from "../../components/Footer";
 
 import {
   ProfileWrapper,
@@ -35,10 +36,12 @@ import {
   PublicationFooter,
   LikeButton,
   AuthorTag,
+  TagPill,
 } from "./styles";
 
 const Profile: React.FC = () => {
   const [likedById, setLikedById] = useState<Record<number, boolean>>({});
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const { username } = useParams();
   const currentUserUsername = "bianca";
   const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername;
@@ -51,6 +54,8 @@ const Profile: React.FC = () => {
       id: 1,
       title: "Caderno de Imunologia",
       description: "Todos meus resumos, esquemas e mapas mentais para dominar os sistemas de defesa do corpo! Foco nas células e mecanismos essenciais. 🔥🧬",
+      tag: "Imunologia",
+      tags: ["Imunologia"],
       image: null,
       author: "Bianca Siega",
     },
@@ -58,6 +63,8 @@ const Profile: React.FC = () => {
       id: 2,
       title: "Artigo do IC",
       description: "Minha primeira publicação científica! Detalhes sobre a aplicação de Machine Learning em Planos assistenciais de saúde. Confira o pôster apresentado no congresso UFCSPA! 🧠📊",
+      tag: "Diagnóstico por Imagem",
+      tags: ["Diagnóstico por Imagem"],
       image: null,
       author: "Bianca Siega",
     },
@@ -65,11 +72,17 @@ const Profile: React.FC = () => {
       id: 3,
       title: "Um código muito massa do workshop de Python!",
       description: "Aprendi um Script em Python que transforma dados de exames em visualizações interativas. Compartilho com vcs a melhor forma de usar Matplot no contexto da saúde <3 📊",
+      tag: "Programação",
+      tags: ["Programação", "Python"],
       image: null,
       author: "Bianca Siega",
     },
   ];
-  // Render helpers to standardize structure like Login
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag((prev) => (prev === tag ? null : tag));
+  };
+
   const renderProfileHeader = () => (
     <ProfileHeaderSection>
       <ProfileAvatar>
@@ -99,43 +112,54 @@ const Profile: React.FC = () => {
       </AboutText>
     </AboutSection>
   );
-
+/* MUDAR AQUI PARA ATRIBUTO DO ENDPOINT E FUNÇÃO UNICA */
   const renderTagsSection = () => (
     <TagsSection>
       <TagsRow>
-        <TagLabel>Diagnóstico por Imagem</TagLabel>
-        <TagLabel>Cálculo II</TagLabel>
-        <TagLabel>Cálculo I</TagLabel>
-        <TagLabel>Imunologia</TagLabel>
-        <TagLabel>Bioinformática</TagLabel>
-        <TagLabel>Genética</TagLabel>
-        <TagLabel>Biotecnologia</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Diagnóstico por Imagem")} data-selected={selectedTag === "Diagnóstico por Imagem"}>{"Diagnóstico por Imagem"}</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Cálculo II")} data-selected={selectedTag === "Cálculo II"}>Cálculo II</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Cálculo I")} data-selected={selectedTag === "Cálculo I"}>Cálculo I</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Imunologia")} data-selected={selectedTag === "Imunologia"}>Imunologia</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Bioinformática")} data-selected={selectedTag === "Bioinformática"}>Bioinformática</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Genética")} data-selected={selectedTag === "Genética"}>Genética</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Biotecnologia")} data-selected={selectedTag === "Biotecnologia"}>Biotecnologia</TagLabel>
       </TagsRow>
       <TagsRow>
-        <TagLabel>Tópicos Avançados em Informática Biomédica</TagLabel>
-        <TagLabel>Modelagem Molecular</TagLabel>
-        <TagLabel>Banco de Dados</TagLabel>
-        <TagLabel>Redação Acadêmica</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Tópicos Avançados em Informática Biomédica")} data-selected={selectedTag === "Tópicos Avançados em Informática Biomédica"}>Tópicos Avançados em Informática Biomédica</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Modelagem Molecular")} data-selected={selectedTag === "Modelagem Molecular"}>Modelagem Molecular</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Banco de Dados")} data-selected={selectedTag === "Banco de Dados"}>Banco de Dados</TagLabel>
+        <TagLabel onClick={() => handleTagClick("Redação Acadêmica")} data-selected={selectedTag === "Redação Acadêmica"}>Redação Acadêmica</TagLabel>
       </TagsRow>
     </TagsSection>
   );
 
   const renderPublicationsSection = () => (
     <PublicationsSection>
-      {publications.map((pub) => (
-        <PublicationCard key={pub.id}>
-          {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
-          <PublicationContent>
-            <PublicationTitle>{pub.title}</PublicationTitle>
-            <PublicationDescription>{pub.description}</PublicationDescription>
-          </PublicationContent>
-          <PublicationFooter>
-            {renderLikeButton(pub.id)}
-            <AuthorTag>- {pub.author}</AuthorTag>
-          </PublicationFooter>
-        </PublicationCard>
-      ))}
-    </PublicationsSection>
+        {publications
+          .filter((pub) => {
+            if (!selectedTag) return true;
+            if (pub.tag && pub.tag === selectedTag) return true;
+            return (pub.tags || []).includes(selectedTag);
+          })
+          .map((pub) => (
+            <PublicationCard key={pub.id}>
+              {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
+              <PublicationContent>
+                <PublicationTitle>{pub.title}</PublicationTitle>
+                <PublicationDescription>{pub.description}</PublicationDescription>
+              </PublicationContent>
+              <PublicationFooter>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {(pub.tag || (pub.tags && pub.tags[0])) && (
+                    <TagPill>{pub.tag || pub.tags[0]}</TagPill>
+                  )}
+                  {renderLikeButton(pub.id)}
+                </div>
+                <AuthorTag>- {pub.author}</AuthorTag>
+              </PublicationFooter>
+            </PublicationCard>
+          ))}
+      </PublicationsSection>
   );
 
   const renderLikeButton = (id: number) => (
@@ -163,6 +187,7 @@ const Profile: React.FC = () => {
         {renderAboutSection()}
         {renderTagsSection()}
         {renderPublicationsSection()}
+        <Footer />
       </PageContainer>
     </ProfileWrapper>
   );

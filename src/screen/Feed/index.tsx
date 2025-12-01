@@ -8,6 +8,7 @@ import PdfIcon from "../../assets/images/pdf.png";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
 import NewsList from "../../components/NewsList";
+import Footer from "../../components/Footer";
 import GraduationIconImg from "../../assets/icons/graduation.svg";
 
 import {
@@ -312,7 +313,10 @@ const Feed: React.FC = () => {
   return (
     <FeedWrapper>
       {renderHeader()}
-      <PageContainer>{renderLayout()}</PageContainer>
+      <PageContainer>
+        {renderLayout()}
+        <Footer />
+      </PageContainer>
     </FeedWrapper>
   );
 };
