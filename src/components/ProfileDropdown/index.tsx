@@ -53,35 +53,36 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName }) => {
 
   const handleLogout = () => {
     setIsOpen(false);
-    // Limpar dados de autenticação se necessário
     navigate("/login");
   };
+  const renderToggleButton = () => (
+    <ProfileButton onClick={handleToggle}>
+      <ProfileAvatar>
+        <AppAvatar name={userName} size={44} />
+      </ProfileAvatar>
+      <ProfileInfo>
+        <ProfileName>{userName}</ProfileName>
+      </ProfileInfo>
+      <ArrowIcon isOpen={isOpen}>▼</ArrowIcon>
+    </ProfileButton>
+  );
+
+  const renderMenu = () => (
+    <DropdownMenu>
+      {location.pathname !== "/feed" && (
+        <DropdownItem onClick={handleFeed}>Feed</DropdownItem>
+      )}
+      {location.pathname !== "/profile" && (
+        <DropdownItem onClick={handleProfile}>Perfil</DropdownItem>
+      )}
+      <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
+    </DropdownMenu>
+  );
 
   return (
     <div ref={dropdownRef} style={{ position: "relative" }}>
-      <ProfileButton onClick={handleToggle}>
-        <ProfileAvatar>
-          <AppAvatar name={userName} size={44} />
-        </ProfileAvatar>
-        <ProfileInfo>
-          <ProfileName>{userName}</ProfileName>
-        </ProfileInfo>
-        <ArrowIcon isOpen={isOpen}>▼</ArrowIcon>
-      </ProfileButton>
-
-      {isOpen && (
-        <DropdownMenu>
-          {/* Show Feed option unless already on /feed */}
-          {location.pathname !== "/feed" && (
-            <DropdownItem onClick={handleFeed}>Feed</DropdownItem>
-          )}
-          {/* Show Perfil unless on own profile (/profile). If viewing another profile (/profile/algum) show Perfil */}
-          {location.pathname !== "/profile" && (
-            <DropdownItem onClick={handleProfile}>Perfil</DropdownItem>
-          )}
-          <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
-        </DropdownMenu>
-      )}
+      {renderToggleButton()}
+      {isOpen && renderMenu()}
     </div>
   );
 };

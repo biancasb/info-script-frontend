@@ -123,12 +123,11 @@ const Feed: React.FC = () => {
       );
     };
 
-
+/* AQUI TERÁ QUE SER AJUSTADO PARA COLOCAR OS ATRIBUTOS DA API DE POSTS */
   const posts = [
     {
       id: 1,
       author: "Laura Ribeiro",
-      meta: "Ingresso em 2021 · Desenvolvedora de Software - Grupo Panvel",
       title: "Diagnóstico por Imagem - Dataset Câncer Bucal",
       text: "Neste trabalho, explorei o uso de técnicas de visão computacional aplicadas ao diagnóstico de câncer bucal, utilizando um dataset composto por imagens clínicas reais...",
       tag: "Diagnóstico por Imagem",
@@ -138,7 +137,6 @@ const Feed: React.FC = () => {
     {
       id: 2,
       author: "Bianca Siega",
-      meta: "Ingresso em 2019 · Quality Assurance Engineer - Grupo Panvel",
       title:
         "Análise de Imagens de Ultrassom Dermatológico Usando DenseNet121 e Transfer Learning",
       text: "Abstract—Artificial intelligence has revolutionized medicine, particularly in the automated analysis of medical images...",

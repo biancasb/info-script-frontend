@@ -539,7 +539,7 @@ export const NewsCard = styled.div`
 `;
 
 export const NewsTitle = styled.h2`
-  margin: 0;
+  margin: 0 0 ${Layout.normalize(12)}px 0;
   font-family: ${Typography.fontFamilyBold};
   font-size: ${Layout.normalize(16)}px;
   color: ${Colors.infoScriptPrimary};

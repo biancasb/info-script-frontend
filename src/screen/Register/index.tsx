@@ -7,9 +7,7 @@ import {
   RegisterCard,
   LogoSection,
   LogoImage,
-  AppTitle,
   FormSection,
-  FormTitle,
   InputGroup,
   Label,
   Input,
@@ -48,75 +46,87 @@ const Register: React.FC = () => {
       return;
     }
 
-    // Placeholder de cadastro
     console.log("Cadastro:", { name, year, username, password });
     navigate("/feed");
   };
 
+  const renderLogo = () => (
+    <LogoSection>
+      <LogoImage src={LogoInfo} alt="InfoScript Logo" />
+    </LogoSection>
+  );
+
+  const renderForm = () => (
+    <>
+      <form onSubmit={handleRegister}>
+        <InputGroup>
+          <Label>Nome</Label>
+          <Input
+            type="text"
+            placeholder="Seu nome"
+            value={name}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Ano ingresso</Label>
+          <Input
+            type="text"
+            placeholder={new Date().getFullYear().toString()}
+            value={year}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
+              setYear(onlyDigits);
+            }}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Usuário</Label>
+          <Input
+            type="text"
+            placeholder="seu_usuario"
+            value={username}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Senha</Label>
+          <Input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          />
+        </InputGroup>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
+        <SubmitButton type="submit">Concluir</SubmitButton>
+      </form>
+    </>
+  );
+
+  const renderHelperText = () => (
+    <HelperText>
+      Já tem conta?
+      <a onClick={() => navigate("/login")}>Entrar</a>
+    </HelperText>
+  );
+
   return (
     <RegisterWrapper>
       <Backdrop>
-      <RegisterCard>
-        <LogoSection>
-          <LogoImage src={LogoInfo} alt="InfoScript Logo" />
-        </LogoSection>
+        <RegisterCard>
+          {renderLogo()}
 
-        <FormSection>
-          <form onSubmit={handleRegister}>
-            <InputGroup>
-              <Label>Nome</Label>
-              <Input
-                type="text"
-                placeholder="Seu nome"
-                value={name}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-              />
-            </InputGroup>
-
-            <InputGroup>
-              <Label>Ano ingresso</Label>
-              <Input
-                type="text"
-                placeholder={new Date().getFullYear().toString()}
-                value={year}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
-                  setYear(onlyDigits);
-                }}
-              />
-            </InputGroup>
-
-            <InputGroup>
-              <Label>Usuário</Label>
-              <Input
-                type="text"
-                placeholder="seu_usuario"
-                value={username}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-              />
-            </InputGroup>
-
-            <InputGroup>
-              <Label>Senha</Label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-              />
-            </InputGroup>
-
-            {error && <ErrorMessage>{error}</ErrorMessage>}
-
-            <SubmitButton type="submit">Concluir</SubmitButton>
-          </form>
-
-          <HelperText>
-            Já tem conta?
-            <a onClick={() => navigate("/login")}>Entrar</a>
-          </HelperText>
-        </FormSection>
-      </RegisterCard>
+          <FormSection>
+            {renderForm()}
+            {renderHelperText()}
+          </FormSection>
+        </RegisterCard>
       </Backdrop>
     </RegisterWrapper>
   );

@@ -69,6 +69,89 @@ const Profile: React.FC = () => {
       author: "Bianca Siega",
     },
   ];
+  // Render helpers to standardize structure like Login
+  const renderProfileHeader = () => (
+    <ProfileHeaderSection>
+      <ProfileAvatar>
+        <AppAvatar name="Bianca Siega" size={120} />
+      </ProfileAvatar>
+      <ProfileInfo>
+        <ProfileName>Bianca Siega</ProfileName>
+        <ProfileSubtitleRow>
+          <GraduationIcon>
+            <img src={GraduationIconImg} alt="Graduação" />
+          </GraduationIcon>
+          <ProfileSubtitle>Ingresso em 2020, UFCSPA.</ProfileSubtitle>
+        </ProfileSubtitleRow>
+      </ProfileInfo>
+      {!isOwnProfile && <FollowButton>+ Seguir</FollowButton>}
+    </ProfileHeaderSection>
+  );
+
+  const renderAboutSection = () => (
+    <AboutSection>
+      <AboutTitle>Sobre mim:</AboutTitle>
+      <AboutText>
+        Codificando o futuro da saúde! <AboutHighlight>🩺❤️</AboutHighlight> Sou a Bibs e estou imersa na InfoBio!
+      </AboutText>
+      <AboutText>
+        <AboutHighlight>Bem vindo a minha página:</AboutHighlight> Notas, resumos e flashcards bem estruturados. <em>Quer um material? Manda DM!</em>
+      </AboutText>
+    </AboutSection>
+  );
+
+  const renderTagsSection = () => (
+    <TagsSection>
+      <TagsRow>
+        <TagLabel>Diagnóstico por Imagem</TagLabel>
+        <TagLabel>Cálculo II</TagLabel>
+        <TagLabel>Cálculo I</TagLabel>
+        <TagLabel>Imunologia</TagLabel>
+        <TagLabel>Bioinformática</TagLabel>
+        <TagLabel>Genética</TagLabel>
+        <TagLabel>Biotecnologia</TagLabel>
+      </TagsRow>
+      <TagsRow>
+        <TagLabel>Tópicos Avançados em Informática Biomédica</TagLabel>
+        <TagLabel>Modelagem Molecular</TagLabel>
+        <TagLabel>Banco de Dados</TagLabel>
+        <TagLabel>Redação Acadêmica</TagLabel>
+      </TagsRow>
+    </TagsSection>
+  );
+
+  const renderPublicationsSection = () => (
+    <PublicationsSection>
+      {publications.map((pub) => (
+        <PublicationCard key={pub.id}>
+          {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
+          <PublicationContent>
+            <PublicationTitle>{pub.title}</PublicationTitle>
+            <PublicationDescription>{pub.description}</PublicationDescription>
+          </PublicationContent>
+          <PublicationFooter>
+            {renderLikeButton(pub.id)}
+            <AuthorTag>- {pub.author}</AuthorTag>
+          </PublicationFooter>
+        </PublicationCard>
+      ))}
+    </PublicationsSection>
+  );
+
+  const renderLikeButton = (id: number) => (
+    <LikeButton
+      type="button"
+      aria-label={likedById[id] ? "Descurtir" : "Curtir"}
+      data-liked={likedById[id] ? "true" : "false"}
+      onClick={() => toggleLike(id)}
+    >
+      {likedById[id] ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <FavoriteBorderIcon fontSize="small" />
+      )}
+    </LikeButton>
+  );
 
   return (
     <ProfileWrapper>
@@ -76,79 +159,10 @@ const Profile: React.FC = () => {
 
       <PageContainer>
         <ProfileBanner />
-        
-        <ProfileHeaderSection>
-          <ProfileAvatar>
-            <AppAvatar name="Bianca Siega" size={120} />
-          </ProfileAvatar>
-          <ProfileInfo>
-            <ProfileName>Bianca Siega</ProfileName>
-            <ProfileSubtitleRow>
-              <GraduationIcon>
-                <img src={GraduationIconImg} alt="Graduação" />
-              </GraduationIcon>
-              <ProfileSubtitle>Ingresso em 2020, UFCSPA.</ProfileSubtitle>
-            </ProfileSubtitleRow>
-            </ProfileInfo>
-            {!isOwnProfile && (
-              <FollowButton>+ Seguir</FollowButton>
-            )}
-        </ProfileHeaderSection>
-
-        <AboutSection>
-          <AboutTitle>Sobre mim:</AboutTitle>
-          <AboutText>
-            Codificando o futuro da saúde! <AboutHighlight>🩺❤️</AboutHighlight> Sou a Bibs e estou imersa na InfoBio!
-          </AboutText>
-          <AboutText>
-            <AboutHighlight>Bem vindo a minha página:</AboutHighlight> Notas, resumos e flashcards bem estruturados. <em>Quer um material? Manda DM!</em>
-          </AboutText>
-        </AboutSection>
-
-        <TagsSection>
-          <TagsRow>
-            <TagLabel>Diagnóstico por Imagem</TagLabel>
-            <TagLabel>Cálculo II</TagLabel>
-            <TagLabel>Cálculo I</TagLabel>
-            <TagLabel>Imunologia</TagLabel>
-            <TagLabel>Bioinformática</TagLabel>
-            <TagLabel>Genética</TagLabel>
-            <TagLabel>Biotecnologia</TagLabel>
-          </TagsRow>
-          <TagsRow>
-            <TagLabel>Tópicos Avançados em Informática Biomédica</TagLabel>
-            <TagLabel>Modelagem Molecular</TagLabel>
-            <TagLabel>Banco de Dados</TagLabel>
-            <TagLabel>Redação Acadêmica</TagLabel>
-          </TagsRow>
-        </TagsSection>
-
-        <PublicationsSection>
-          {publications.map((pub) => (
-            <PublicationCard key={pub.id}>
-              {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
-              <PublicationContent>
-                <PublicationTitle>{pub.title}</PublicationTitle>
-                <PublicationDescription>{pub.description}</PublicationDescription>
-              </PublicationContent>
-              <PublicationFooter>
-                <LikeButton
-                  type="button"
-                  aria-label={likedById[pub.id] ? "Descurtir" : "Curtir"}
-                  data-liked={likedById[pub.id] ? "true" : "false"}
-                  onClick={() => toggleLike(pub.id)}
-                >
-                  {likedById[pub.id] ? (
-                    <FavoriteIcon fontSize="small" />
-                  ) : (
-                    <FavoriteBorderIcon fontSize="small" />
-                  )}
-                </LikeButton>
-                <AuthorTag>- {pub.author}</AuthorTag>
-              </PublicationFooter>
-            </PublicationCard>
-          ))}
-        </PublicationsSection>
+        {renderProfileHeader()}
+        {renderAboutSection()}
+        {renderTagsSection()}
+        {renderPublicationsSection()}
       </PageContainer>
     </ProfileWrapper>
   );
