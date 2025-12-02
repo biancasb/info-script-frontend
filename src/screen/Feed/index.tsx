@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Header from "../../components/Header";
@@ -49,6 +50,7 @@ import {
   PostTagRow,
   PostTag,
   PostFooter,
+  PostDeleteButton,
   GithubLink,
   PdfBadge,
   PdfBadgeText,
@@ -59,25 +61,30 @@ import {
 
 const Feed: React.FC = () => {
     const [tags, setTags] = useState<string[]>([]);
-    const [tagInput, setTagInput] = useState("");
     const [links, setLinks] = useState<string[]>([]);
     const [linkInput, setLinkInput] = useState("");
+      const [tagInput, setTagInput] = useState("");
 
 
     const handleTagKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if ((event.key === "Enter" || event.key === ",") && tagInput.trim()) {
+      if ((event.key === "Enter" || event.key === ",") && tagInput.trim()) {
         event.preventDefault();
-        const newTag = tagInput.trim();
+        addTag(tagInput.trim());
+        return;
+      }
 
-        if (!tags.includes(newTag)) {
-        setTags((prev) => [...prev, newTag]);
-        }
-        setTagInput("");
-    }
-
-    if (event.key === "Backspace" && !tagInput && tags.length) {
+      if (event.key === "Backspace" && !tagInput && tags.length) {
         setTags((prev) => prev.slice(0, prev.length - 1));
-    }
+      }
+    };
+
+    const addTag = (tag: string) => {
+      const normalized = tag.trim();
+      if (!normalized) return;
+      if (!tags.includes(normalized)) {
+        setTags((prev) => [...prev, normalized]);
+      }
+      setTagInput("");
     };
 
     const handleRemoveTag = (tagToRemove: string) => {
@@ -125,10 +132,11 @@ const Feed: React.FC = () => {
     };
 
 /* AQUI TERÁ QUE SER AJUSTADO PARA COLOCAR OS ATRIBUTOS DA API DE POSTS */
-  const posts = [
+  const initialPosts = [
     {
       id: 1,
       author: "Laura Ribeiro",
+      year: 2019,
       title: "Diagnóstico por Imagem - Dataset Câncer Bucal",
       text: "Neste trabalho, explorei o uso de técnicas de visão computacional aplicadas ao diagnóstico de câncer bucal, utilizando um dataset composto por imagens clínicas reais...",
       tag: "Diagnóstico por Imagem",
@@ -138,6 +146,7 @@ const Feed: React.FC = () => {
     {
       id: 2,
       author: "Bianca Siega",
+      year: 2019,
       title:
         "Análise de Imagens de Ultrassom Dermatológico Usando DenseNet121 e Transfer Learning",
       text: "Abstract—Artificial intelligence has revolutionized medicine, particularly in the automated analysis of medical images...",
@@ -146,6 +155,14 @@ const Feed: React.FC = () => {
       pdf: "DenseNet121BiancaSiega.pdf",
     },
   ];
+
+  const [posts, setPosts] = useState(initialPosts);
+
+  const handleDeletePost = (id: number) => {
+    const ok = window.confirm("Tem certeza que deseja excluir este post?");
+    if (!ok) return;
+    setPosts((prev) => prev.filter((p) => p.id !== id));
+  };
 
   const [likedPosts, setLikedPosts] = useState<Record<number, boolean>>({});
   const togglePostLike = (id: number) => {
@@ -191,15 +208,15 @@ const Feed: React.FC = () => {
         ))}
       </ComposerLinksRow>
       <ComposerTagsRow>
-        <ComposerTagFake>
-          <ComposerTagInput
-            type="text"
-            placeholder={tags.length ? "Adicionar outra tag" : "Escolha suas tags"}
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
-          />
-        </ComposerTagFake>
+            <ComposerTagFake>
+              <ComposerTagInput
+                type="text"
+                placeholder={tags.length ? "Adicionar outra tag" : "Escolha suas tags"}
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+              />
+            </ComposerTagFake>
         {tags.map((tag) => (
           <ComposerTagPill key={tag}>
             {tag}
@@ -223,13 +240,26 @@ const Feed: React.FC = () => {
     <>
       {posts.map((post) => (
         <PostCard key={post.id}>
+          <PostDeleteButton
+            type="button"
+            aria-label={`Excluir post ${post.id}`}
+            title="Excluir publicação"
+            onClick={() => handleDeletePost(post.id)}
+          >
+            <DeleteOutlineIcon style={{ fontSize: 18 }} />
+          </PostDeleteButton>
           <PostHeader>
             <PostAvatarSmall>
               <AppAvatar name={post.author} size={36} />
             </PostAvatarSmall>
             <PostHeaderInfo>
               <PostHeaderName>{post.author}</PostHeaderName>
-              <PostHeaderMeta>{post.meta}</PostHeaderMeta>
+              <PostHeaderMeta>
+                <GraduationIcon>
+                  <img src={GraduationIconImg} alt="Graduação" />
+                </GraduationIcon>
+                Ingresso em {post.year}
+              </PostHeaderMeta>
             </PostHeaderInfo>
           </PostHeader>
           <PostTitle>{post.title}</PostTitle>

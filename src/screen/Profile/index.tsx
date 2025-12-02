@@ -7,6 +7,8 @@ import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
 import Footer from "../../components/Footer";
+import GithubIcon from "../../assets/images/github-mark.png";
+import PdfIcon from "../../assets/images/pdf.png";
 
 import {
   ProfileWrapper,
@@ -37,6 +39,10 @@ import {
   LikeButton,
   AuthorTag,
   TagPill,
+  GithubLink,
+  PdfBadge,
+  PdfBadgeText,
+  PublicationLinksRow,
 } from "./styles";
 
 const Profile: React.FC = () => {
@@ -58,6 +64,8 @@ const Profile: React.FC = () => {
       tags: ["Imunologia"],
       image: null,
       author: "Bianca Siega",
+      github: null,
+      pdf: null,
     },
     {
       id: 2,
@@ -67,6 +75,8 @@ const Profile: React.FC = () => {
       tags: ["Diagnóstico por Imagem"],
       image: null,
       author: "Bianca Siega",
+      github: "https://github.com/biancasb/ic-paper",
+      pdf: "Artigo_IC_Poster.pdf",
     },
     {
       id: 3,
@@ -76,6 +86,8 @@ const Profile: React.FC = () => {
       tags: ["Programação", "Python"],
       image: null,
       author: "Bianca Siega",
+      github: "https://github.com/biancasb/python-workshop",
+      pdf: null,
     },
   ];
 
@@ -146,7 +158,23 @@ const Profile: React.FC = () => {
               {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
               <PublicationContent>
                 <PublicationTitle>{pub.title}</PublicationTitle>
-                <PublicationDescription>{pub.description}</PublicationDescription>
+                  <PublicationDescription>{pub.description}</PublicationDescription>
+                {(pub.github || pub.pdf) && (
+                  <PublicationLinksRow align={pub.github && pub.pdf ? 'center' : 'left'}>
+                    {pub.github && (
+                      <GithubLink href={pub.github} target="_blank" rel="noopener noreferrer">
+                        <img src={GithubIcon} alt="GitHub" style={{ width: 18, height: 18, objectFit: 'contain', marginRight: 8 }} />
+                        {pub.github.replace('https://', '')}
+                      </GithubLink>
+                    )}
+                    {pub.pdf && (
+                      <PdfBadge href={pub.pdf} target="_blank" rel="noopener noreferrer">
+                        <img src={PdfIcon} alt="PDF" style={{ width: 18, height: 18, objectFit: 'contain', marginRight: 8 }} />
+                        <PdfBadgeText>{pub.pdf}</PdfBadgeText>
+                      </PdfBadge>
+                    )}
+                  </PublicationLinksRow>
+                )}
               </PublicationContent>
               <PublicationFooter>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
