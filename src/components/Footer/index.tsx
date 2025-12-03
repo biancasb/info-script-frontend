@@ -11,11 +11,11 @@ const Footer: React.FC = () => {
 
   const renderLinks = () => (
     <FooterLinks>
-      <FooterLink href="/about">
+      <FooterLink href="https://moodle.ufcspa.edu.br/" aria-label="Moodle UFCSPA">
         <FooterIcon>
           <InfoOutlinedIcon fontSize="small" />
         </FooterIcon>
-        Sobre
+        Moodle
       </FooterLink>
 
       <FooterLink href="https://ufcspa.edu.br/" target="_blank" rel="noopener noreferrer" aria-label="UFCSPA">
