@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import api from "../../services/api";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import GraduationIconImg from "../../assets/icons/graduation.svg";
@@ -12,7 +13,6 @@ import PdfIcon from "../../assets/images/pdf.png";
 
 import {
   ProfileWrapper,
-  
   ProfileBanner,
   ProfileHeaderSection,
   ProfileAvatar,
@@ -51,6 +51,18 @@ const Profile: React.FC = () => {
   const { username } = useParams();
   const currentUserUsername = "bianca";
   const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername;
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const u = username || currentUserUsername;
+        await api.get(`/profiles/${u}`);
+      } catch (e) {
+        console.warn("Falha ao carregar perfil", e);
+      }
+    };
+    loadProfile();
+  }, [username]);
 
   const toggleLike = (id: number) => {
     setLikedById((prev) => ({ ...prev, [id]: !prev[id] }));

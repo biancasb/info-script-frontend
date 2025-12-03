@@ -18,22 +18,37 @@ import {
   HelperText,
   Backdrop,
 } from "./styles";
+import api from "@/services/api";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [, setProfile] = useState<{ nickname: string; anoIngresso: number; tags: string[]; publications: any[] } | null>(null);
 
-    if (!username || !password) {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!nickname || !senha) {
       setError("Preencha todos os campos");
       return;
     }
 
-    navigate("/feed");
+    try {
+      const u = { nickname, senha };
+      const res = await api.post(`/usuarios/login`, u);
+      if (res.data?.token) {//salvar o token no localStorage
+        localStorage.setItem("auth_token", res.data.token);
+      }
+      setProfile(res.data);
+      navigate("/feed");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Falha no login. Verifique suas credenciais.";
+      setError(msg);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -71,19 +86,18 @@ const Login: React.FC = () => {
           <Label>Usuário</Label>
           <Input
             type="text"
-            placeholder="seu_usuario"
-            value={username}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            placeholder="seu usuario"
+            value={nickname}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
           />
         </InputGroup>
-
         <InputGroup>
           <Label>Senha</Label>
           <Input
             type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            placeholder="sua senha"
+            value={senha}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
           />
         </InputGroup>
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoInfo from "../../assets/images/infoScript.png";
+import api from "@/services/api";
 
 import {
   RegisterWrapper,
@@ -19,19 +20,23 @@ import {
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [year, setYear] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [nome, setNome] = useState("");
+  const [anoIngresso, setAnoIngresso] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
+  // manter setter para uso futuro sem warning de variável não utilizada
+  const [, setRegister] = useState<{ nome: string; anoIngresso: number; nickname: string; senha: string; token?: string } | null>(null);
+  
+  const handleRegister = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError("");
 
     const currentYear = new Date().getFullYear();
-    const yearNum = parseInt(year, 10);
+    const yearNum = parseInt(anoIngresso, 10);
 
-    if (!name || !year || !username || !password) {
+    if (!nome || !anoIngresso || !nickname || !senha) {
       setError("Preencha todos os campos");
       return;
     }
@@ -46,8 +51,18 @@ const Register: React.FC = () => {
       return;
     }
 
-    console.log("Cadastro:", { name, year, username, password });
-    navigate("/feed");
+    try {
+      const u = { nome, nickname, senha, anoIngresso: yearNum };
+      const res = await api.post(`/usuarios`, u);
+      if (res.data?.token) {
+        localStorage.setItem("auth_token", res.data.token);
+      }
+      setRegister(res.data);
+      navigate("/feed");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Falha ao criar conta. Verifique os dados e tente novamente.";
+      setError(msg);
+    }
   };
 
   const renderLogo = () => (
@@ -63,9 +78,9 @@ const Register: React.FC = () => {
           <Label>Nome</Label>
           <Input
             type="text"
-            placeholder="Seu nome"
-            value={name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+            placeholder="seu nome"
+            value={nome}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
           />
         </InputGroup>
 
@@ -74,10 +89,10 @@ const Register: React.FC = () => {
           <Input
             type="text"
             placeholder={new Date().getFullYear().toString()}
-            value={year}
+            value={anoIngresso}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
-              setYear(onlyDigits);
+              setAnoIngresso(onlyDigits);
             }}
           />
         </InputGroup>
@@ -86,9 +101,9 @@ const Register: React.FC = () => {
           <Label>Usuário</Label>
           <Input
             type="text"
-            placeholder="seu_usuario"
-            value={username}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            placeholder="seu usuario"
+            value={nickname}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
           />
         </InputGroup>
 
@@ -96,9 +111,9 @@ const Register: React.FC = () => {
           <Label>Senha</Label>
           <Input
             type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            placeholder="sua senha"
+            value={senha}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
           />
         </InputGroup>
 
