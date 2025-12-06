@@ -3,17 +3,16 @@ import { Colors, Layout, Typography } from "@/constants";
 
 export const LoginWrapper = styled.div`
   min-height: 100vh;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  background: transparent;
+  background: linear-gradient(135deg, #5FA5CE 0%, #305a93 100%);
 `;
 
 export const Backdrop = styled.div`
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #5FA5CE 0%, #305a93 100%);
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,10 +21,10 @@ export const Backdrop = styled.div`
 
 export const LoginCard = styled.div`
   background: ${Colors.commonWhite};
-  border-radius: ${Layout.normalize(24)}px;
-  padding: ${Layout.normalize(48)}px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 520px;
+  border-radius: ${Layout.normalize(20)}px;
+  padding: ${Layout.normalize(36)}px ${Layout.normalize(36)}px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  max-width: 460px;
   width: 100%;
 `;
 
@@ -37,7 +36,7 @@ export const LogoSection = styled.div`
 `;
 
 export const LogoImage = styled.img`
-  width: ${Layout.normalize(120)}px;
+  width: ${Layout.normalize(100)}px;
   height: auto;
   margin-bottom: ${Layout.normalize(16)}px;
 `;

@@ -269,8 +269,8 @@ export const TagPill = styled.span`
 
 export const ComposerCard = styled.div`
   background: ${Colors.commonWhite};
-  border-radius: ${Layout.normalize(16)}px;
-  padding: ${Layout.normalize(20)}px;
+  border-radius: ${Layout.normalize(12)}px;
+  padding: ${Layout.normalize(14)}px ${Layout.normalize(16)}px;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
   margin-bottom: ${Layout.normalize(16)}px;
 `;
@@ -302,6 +302,7 @@ export const ComposerTagsRow = styled.div`
   gap: ${Layout.normalize(8)}px;
   margin-bottom: ${Layout.normalize(12)}px;
   flex-wrap: wrap;
+  position: relative; /* ancorar sugestões aqui para não quebrar o fluxo */
 `;
 
 export const ComposerLinksRow = styled.div`
@@ -323,6 +324,13 @@ export const ComposerLinkInput = styled.input`
 
   &::placeholder {
     color: ${Colors.infoScriptTextSecondary};
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f3f4f6;
+    border-color: #cbd5e1;
   }
 `;
 
@@ -394,6 +402,37 @@ export const RemoveTagButton = styled.button`
   line-height: 1;
 `;
 
+export const SuggestionsList = styled.ul`
+  position: absolute;
+  top: ${Layout.normalize(36)}px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: ${Colors.commonWhite};
+  border: 1px solid #e5e7eb;
+  border-radius: ${Layout.normalize(12)}px;
+  box-shadow: 0 12px 24px rgba(15,23,42,0.12);
+  list-style: none;
+  margin: 0;
+  padding: ${Layout.normalize(6)}px;
+  display: flex;
+  flex-direction: column;
+  gap: ${Layout.normalize(4)}px;
+`;
+
+export const SuggestionItem = styled.li`
+  padding: ${Layout.normalize(8)}px ${Layout.normalize(10)}px;
+  border-radius: ${Layout.normalize(8)}px;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(12)}px;
+  color: ${Colors.infoScriptTextPrimary};
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+`;
+
 export const ComposerActions = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -415,19 +454,46 @@ export const PostCard = styled.article`
   background: ${Colors.commonWhite};
   border-radius: ${Layout.normalize(16)}px;
   padding: ${Layout.normalize(20)}px;
+  position: relative; /* para posicionamento do botão de delete */
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
   margin-bottom: ${Layout.normalize(16)}px;
 `;
 
+export const PostDeleteButton = styled.button`
+  position: absolute;
+  top: ${Layout.normalize(8)}px;
+  right: ${Layout.normalize(8)}px;
+  width: ${Layout.normalize(34)}px;
+  height: ${Layout.normalize(34)}px;
+  border-radius: 999px;
+  border: none;
+  background: ${Colors.infoScriptPrimarySoft};
+  color: ${Colors.infoScriptPrimary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(15,23,42,0.08);
+  padding: 0;
+
+  svg {
+    display: block;
+  }
+  &:hover {
+    box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+    transform: translateY(-1px);
+  }
+`;
+
 export const PostHeader = styled.div`
   display: flex;
-  gap: ${Layout.normalize(10)}px;
-  margin-bottom: ${Layout.normalize(8)}px;
+  gap: ${Layout.normalize(12)}px;
+  margin-bottom: ${Layout.normalize(10)}px;
 `;
 
 export const PostAvatarSmall = styled.div`
-  width: ${Layout.normalize(40)}px;
-  height: ${Layout.normalize(40)}px;
+  width: ${Layout.normalize(48)}px;
+  height: ${Layout.normalize(48)}px;
   border-radius: 999px;
   background: transparent;
   display: flex;
@@ -445,24 +511,30 @@ export const PostAvatarSmall = styled.div`
 export const PostHeaderInfo = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
 `;
 
 export const PostHeaderName = styled.div`
   font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(15)}px;
+  font-size: ${Layout.normalize(18)}px;
+  color: ${Colors.infoScriptOthersPucBlue};
+  font-weight: bold;
 `;
 
 export const PostHeaderMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${Layout.normalize(8)}px;
   font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(12)}px;
-  color: ${Colors.infoScriptTextSecondary};
+  font-size: ${Layout.normalize(13)}px;
+  color: ${Colors.infoScriptPrimary};
 `;
 
 export const PostTitle = styled.h2`
-  margin: ${Layout.normalize(8)}px 0;
+  margin: ${Layout.normalize(10)}px 0;
   font-family: ${Typography.fontFamilyBold};
   font-size: ${Layout.normalize(16)}px;
-  color: ${Colors.infoScriptTextPrimary};
+  color: ${Colors.infoScriptOthersPucBlue};
 `;
 
 export const PostText = styled.p`
@@ -539,7 +611,7 @@ export const NewsCard = styled.div`
 `;
 
 export const NewsTitle = styled.h2`
-  margin: 0;
+  margin: 0 0 ${Layout.normalize(12)}px 0;
   font-family: ${Typography.fontFamilyBold};
   font-size: ${Layout.normalize(16)}px;
   color: ${Colors.infoScriptPrimary};

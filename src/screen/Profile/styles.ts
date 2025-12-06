@@ -261,6 +261,13 @@ export const TagLabel = styled.span`
   font-family: ${Typography.fontFamilyRegular};
   font-size: ${Layout.normalize(13)}px;
   border: 1px solid #d1e5f0;
+  cursor: pointer;
+  user-select: none;
+
+  &[data-selected="true"] {
+    background: #d1e5f0;
+    border-color: #9fc1d6;
+  }
 `;
 
 export const TagPill = styled.span`
@@ -302,10 +309,7 @@ export const PublicationCard = styled.div`
     transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
-
-  &:nth-child(3) {
-    border-color: #4a7ba7;
-  }
+  
 `;
 
 export const PublicationImage = styled.img`
@@ -318,6 +322,9 @@ export const PublicationImage = styled.img`
 export const PublicationContent = styled.div`
   padding: ${Layout.normalize(16)}px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: ${Layout.normalize(8)}px;
 `;
 
 export const PublicationTitle = styled.h3`
@@ -334,6 +341,7 @@ export const PublicationDescription = styled.p`
   color: ${Colors.infoScriptTextPrimary};
   line-height: 1.5;
   margin: 0;
+  flex: 1 1 auto;
 `;
 
 export const PublicationFooter = styled.div`
@@ -371,4 +379,53 @@ export const AuthorTag = styled.span`
   font-family: ${Typography.fontFamilyRegular};
   font-size: ${Layout.normalize(12)}px;
   color: ${Colors.infoScriptTextInverse};
+`;
+
+export const GithubLink = styled.a`
+  border-radius: 999px;
+  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
+  border: 1px solid #e5e7eb;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(12)}px;
+  text-decoration: none;
+  color: ${Colors.infoScriptTextPrimary};
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+`;
+
+export const PdfBadge = styled.a`
+  border-radius: 999px;
+  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
+  border: 1px solid #e5e7eb;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(12)}px;
+  text-decoration: none;
+  color: ${Colors.infoScriptTextPrimary};
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+`;
+
+export const PdfBadgeText = styled.span`
+  color: ${Colors.infoScriptTextPrimary};
+  font-weight: 500;
+`;
+
+interface PublicationLinksRowProps {
+  align?: 'center' | 'left';
+}
+
+export const PublicationLinksRow = styled.div<PublicationLinksRowProps>`
+  display: flex;
+  gap: ${Layout.normalize(12)}px;
+  justify-content: ${(p) => (p.align === 'center' ? 'center' : 'flex-start')};
+  align-items: center;
+  margin-top: ${Layout.normalize(12)}px;
 `;

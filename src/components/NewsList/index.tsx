@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { List, Item, ItemTitle, ItemMeta, ItemLink, Loading, ErrorBox, Thumb, ItemExcerpt } 
-from "./styles";
+import {
+  List,
+  Item,
+  ItemTitle,
+  ItemMeta,
+  ItemLink,
+  Loading,
+  ErrorBox,
+  Thumb,
+  ItemExcerpt,
+  ItemContent,
+} from "./styles";
 
 interface DevToArticle {
   id: number;
@@ -21,11 +31,20 @@ const NewsList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.debug("NewsList: mounted");
+    return () => console.debug("NewsList: unmounted");
+  }, []);
+
+  useEffect(() => {
+    console.debug("NewsList state", { loading, error, articles: articles.length });
+  }, [loading, error, articles.length]);
+
+  useEffect(() => {
     let mounted = true;
     let controller: AbortController | null = null;
-    const REFRESH_MS = 5 * 60 * 1000; // 5 minutos
+    const REFRESH_MS = 5 * 60 * 1000; 
     const CACHE_KEY = "devto_news_cache_v1";
-    const CACHE_MAX_AGE = 60 * 60 * 1000; // 1 hora
+    const CACHE_MAX_AGE = 60 * 60 * 1000; 
 
     const load = async (options?: { initial?: boolean }) => {
       try {
@@ -34,31 +53,32 @@ const NewsList: React.FC = () => {
         if (options?.initial) setLoading(true);
         setError(null);
         const base = "https://dev.to/api";
-        // Prioriza os "top da semana" para cobrir https://dev.to/top/week
         const candidates = [
-          `${base}/articles?per_page=8&top=7`,
-          `${base}/articles?per_page=8&state=rising`,
-          `${base}/articles/latest?per_page=8`,
+          `${base}/articles?per_page=20&top=7`,
+          `${base}/articles?per_page=20`,
+          `${base}/articles?per_page=20&state=rising`,
+          `${base}/articles/latest?per_page=20`,
         ];
 
         let success = false;
         let itemsForCache: DevToArticle[] | null = null;
         for (const endpoint of candidates) {
-          try {
+            try {
             const url = `${endpoint}&_ts=${Date.now()}`;
             const res = await fetch(url, {
               signal: controller.signal,
               cache: "no-store",
               headers: {
-                "Cache-Control": "no-cache",
                 Accept: "application/vnd.forem.api-v1+json",
               },
             });
-            if (!res.ok) continue;
+            if (!res.ok) {
+              console.debug("NewsList: endpoint failed", endpoint, res.status);
+              continue;
+            }
             const data: DevToArticle[] = await res.json();
             if (Array.isArray(data) && data.length) {
               if (!mounted) return;
-              // Preferir notícias do dia; complementar com do mês com imagem
               const now = new Date();
               const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
               const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -70,25 +90,126 @@ const NewsList: React.FC = () => {
                 const dt = new Date(d);
                 return dt >= startOfMonth && dt <= now;
               };
-              const todayItems = data.filter(a => isToday(a.published_at));
+
+              const withImage = data.filter((a) => !!a.cover_image || !!a.social_image);
+              const todayWithImage = withImage.filter((a) => isToday(a.published_at));
+              const monthWithImage = withImage.filter((a) => !isToday(a.published_at) && isThisMonth(a.published_at));
+
+              const today = data.filter((a) => isToday(a.published_at));
+              const month = data.filter((a) => !isToday(a.published_at) && isThisMonth(a.published_at));
+
               let chosen: DevToArticle[] = [];
-              if (todayItems.length >= 4) {
-                // se já há notícias suficientes do dia, usa até 8
-                chosen = todayItems.slice(0, 8);
+
+              if (todayWithImage.length >= 4) {
+                // já há imagens suficientes do dia
+                chosen = todayWithImage.slice(0, 8);
               } else {
-                // complementa com do mês que tenham imagem de capa
-                const monthWithImage = data
-                  .filter(a => !isToday(a.published_at) && isThisMonth(a.published_at) && !!a.cover_image)
-                  .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
-                chosen = [...todayItems, ...monthWithImage].slice(0, 8);
+                chosen = [
+                  ...todayWithImage,
+                  ...monthWithImage,
+                ];
+
+                if (chosen.length < 8) {
+                  const addToday = today.filter((a) => !chosen.includes(a));
+                  chosen = [...chosen, ...addToday];
+                }
+
+                if (chosen.length < 8) {
+                  const addMonth = month.filter((a) => !chosen.includes(a));
+                  chosen = [...chosen, ...addMonth];
+                }
+
+                if (chosen.length < 8) {
+                  const addOtherWithImage = withImage.filter((a) => !chosen.includes(a));
+                  chosen = [...chosen, ...addOtherWithImage];
+                }
+
+                if (chosen.length < 8) {
+                  const others = data.filter((a) => !chosen.includes(a));
+                  chosen = [...chosen, ...others];
+                }
+
+                chosen = chosen.slice(0, 8);
               }
+
               setArticles(chosen.length ? chosen : data);
               itemsForCache = chosen.length ? chosen : data;
               success = true;
               break;
             }
-          } catch (_) {
-            // tenta próximo endpoint
+          } catch (err) {
+            console.debug("NewsList: direct fetch failed, trying proxy", endpoint, err);
+            try {
+              const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+              const proxyRes = await fetch(proxy, { cache: "no-store" });
+              if (!proxyRes.ok) {
+                console.debug("NewsList: proxy fetch failed", proxyRes.status);
+                continue;
+              }
+              const text = await proxyRes.text();
+              let data: DevToArticle[] = [];
+              try {
+                data = JSON.parse(text) as DevToArticle[];
+              } catch (e) {
+                console.debug("NewsList: proxy returned non-json", e);
+                continue;
+              }
+
+              if (Array.isArray(data) && data.length) {
+                if (!mounted) return;
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const isToday = (d: string) => {
+                  const dt = new Date(d);
+                  return dt >= startOfDay;
+                };
+                const isThisMonth = (d: string) => {
+                  const dt = new Date(d);
+                  return dt >= startOfMonth && dt <= now;
+                };
+
+                const withImage = data.filter((a) => !!a.cover_image || !!a.social_image);
+                const todayWithImage = withImage.filter((a) => isToday(a.published_at));
+                const monthWithImage = withImage.filter((a) => !isToday(a.published_at) && isThisMonth(a.published_at));
+                const today = data.filter((a) => isToday(a.published_at));
+                const month = data.filter((a) => !isToday(a.published_at) && isThisMonth(a.published_at));
+
+                let chosen: DevToArticle[] = [];
+
+                if (todayWithImage.length >= 4) {
+                  chosen = todayWithImage.slice(0, 8);
+                } else {
+                  chosen = [...todayWithImage, ...monthWithImage];
+                  if (chosen.length < 8) {
+                    const addToday = today.filter((a) => !chosen.includes(a));
+                    chosen = [...chosen, ...addToday];
+                  }
+                  if (chosen.length < 8) {
+                    const addMonth = month.filter((a) => !chosen.includes(a));
+                    chosen = [...chosen, ...addMonth];
+                  }
+                  if (chosen.length < 8) {
+                    const addOtherWithImage = withImage.filter((a) => !chosen.includes(a));
+                    chosen = [...chosen, ...addOtherWithImage];
+                  }
+                  if (chosen.length < 8) {
+                    const others = data.filter((a) => !chosen.includes(a));
+                    chosen = [...chosen, ...others];
+                  }
+                  chosen = chosen.slice(0, 8);
+                }
+
+                setArticles(chosen.length ? chosen : data);
+                itemsForCache = chosen.length ? chosen : data;
+                success = true;
+                break;
+              }
+            } catch (e2) {
+              // falhou também via proxy - tenta próximo endpoint
+              console.debug("NewsList: proxy attempt failed", e2);
+              continue;
+            }
           }
         }
 
@@ -207,18 +328,27 @@ const NewsList: React.FC = () => {
       {articles.map((a) => {
         const date = new Date(a.published_at);
         const dateStr = date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-        // Só mostra imagem quando há capa real; caso contrário, apenas título
-        const imgSrc = a.cover_image || null;
+        // Preferir `cover_image`, depois `social_image` quando houver
+        const imgSrc = a.cover_image || a.social_image || null;
         return (
           <Item key={a.id}>
-            <ItemLink href={a.url} target="_blank" rel="noopener noreferrer">
-              {imgSrc && <Thumb src={imgSrc} alt={a.title} loading="lazy" />}
-              <ItemTitle>{a.title}</ItemTitle>
-            </ItemLink>
-            <ItemMeta>
-              {dateStr} · {a.reading_time_minutes} min
-            </ItemMeta>
-            {a.description && <ItemExcerpt>{a.description}</ItemExcerpt>}
+            {imgSrc && (
+              <ItemLink href={a.url} target="_blank" rel="noopener noreferrer">
+                <Thumb src={imgSrc} alt={a.title} loading="lazy" />
+              </ItemLink>
+            )}
+
+            <ItemContent>
+              <ItemLink href={a.url} target="_blank" rel="noopener noreferrer">
+                <ItemTitle>{a.title}</ItemTitle>
+              </ItemLink>
+
+              <ItemMeta>
+                {dateStr} · {a.reading_time_minutes} min
+              </ItemMeta>
+
+              {a.description && <ItemExcerpt>{a.description}</ItemExcerpt>}
+            </ItemContent>
           </Item>
         );
       })}
