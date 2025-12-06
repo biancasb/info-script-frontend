@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Header from "../../components/Header";
 import Colors from "../../constants/Colors";
 import GithubIcon from "../../assets/images/github-mark.png";
-import PdfIcon from "../../assets/images/pdf.png";
+import IconLink from "../../assets/images/icon-link.png";
+import api from "@/services/api";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
 import NewsList from "../../components/NewsList";
@@ -39,6 +40,8 @@ import {
   ComposerPublishButton,
   ComposerLinkInput,
   LinkBadge,
+  SuggestionsList,
+  SuggestionItem,
   PostCard,
   PostHeader,
   PostAvatarSmall,
@@ -58,34 +61,104 @@ import {
   NewsTitle,
 } from "./styles";
 
+const formatLinkLabel = (url: string) => {
+  try {
+    const u = new URL(url);
+    const host = u.host;
+    let path = u.pathname + (u.search || "");
+    const full = `${host}${path}`.replace(/\/$/, "");
+    if (full.length > 60) {
+      return full.slice(0, 57) + "...";
+    }
+    return full || host;
+  } catch {
+    const clean = url.replace(/^https?:\/\//, "");
+    return clean.length > 60 ? clean.slice(0, 57) + "..." : clean;
+  }
+};
+
 
 const Feed: React.FC = () => {
+    const [titulo, setTitulo] = useState("");
+    const [texto, setTexto] = useState("");
     const [tags, setTags] = useState<string[]>([]);
     const [links, setLinks] = useState<string[]>([]);
     const [linkInput, setLinkInput] = useState("");
-      const [tagInput, setTagInput] = useState("");
+    const [materias, setMaterias] = useState<string[]>([]);
+    const [filteredMaterias, setFilteredMaterias] = useState<string[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [posts, setPosts] = useState<any[]>([]);
+    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+
+    useEffect(() => {
+      const loadMaterias = async () => {
+        try {
+          const res = await api.get("/materias");
+          const payload = res.data;
+          const arr = Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+          const names: string[] = arr
+            .map((m: any) => m?.nome)
+            .filter((v: any) => typeof v === "string" && v.trim().length > 0);
+          const list = names.filter(Boolean);
+          setMaterias(list);
+          // ao carregar, prepara lista completa de matérias
+          const next = list.filter((m) => !tags.includes(m));
+          setFilteredMaterias(next);
+        } catch (e) {
+          // falha silenciosa; mantém sem sugestões
+          console.warn("Falha ao carregar matérias", e);
+        }
+      };
+      loadMaterias();
+    }, []);
+
+    useEffect(() => {
+      const loadPostagens = async () => {
+        try {
+          setIsLoadingPosts(true);
+          const res = await api.get("/postagens");
+          const payload = res.data;
+          const arr = Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+          setPosts(arr);
+        } catch (e) {
+          console.error("Falha ao carregar postagens", e);
+        } finally {
+          setIsLoadingPosts(false);
+        }
+      };
+      loadPostagens();
+    }, []);
 
 
-    const handleTagKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if ((event.key === "Enter" || event.key === ",") && tagInput.trim()) {
-        event.preventDefault();
-        addTag(tagInput.trim());
-        return;
-      }
+    // campo de tag não será digitável, apenas seleção
 
-      if (event.key === "Backspace" && !tagInput && tags.length) {
-        setTags((prev) => prev.slice(0, prev.length - 1));
-      }
-    };
+  // não há mudança por digitação, apenas abrir lista completa ao focar/clicar
 
-    const addTag = (tag: string) => {
-      const normalized = tag.trim();
-      if (!normalized) return;
-      if (!tags.includes(normalized)) {
-        setTags((prev) => [...prev, normalized]);
-      }
-      setTagInput("");
-    };
+  const onTagFocus = () => {
+    const next = materias.filter((m) => !tags.includes(m));
+    setFilteredMaterias(next);
+    setShowSuggestions(next.length > 0);
+  };
+
+  const onTagBlur = () => {
+    // pequeno atraso para permitir clique na sugestão
+    setTimeout(() => setShowSuggestions(false), 120);
+  };
+
+  const addTag = (tag: string) => {
+    const normalized = tag.trim();
+    if (!normalized) return;
+    setTags([normalized]);
+    setShowSuggestions(false);
+  };
 
     const handleRemoveTag = (tagToRemove: string) => {
     setTags((prev) => prev.filter((tag) => tag !== tagToRemove));
@@ -95,7 +168,7 @@ const Feed: React.FC = () => {
       if (event.key === "Enter" && linkInput.trim()) {
         event.preventDefault();
         const url = linkInput.trim();
-        setLinks((prev) => (prev.includes(url) ? prev : [...prev, url]));
+        setLinks([url]);
         setLinkInput("");
       }
     };
@@ -104,16 +177,51 @@ const Feed: React.FC = () => {
       setLinks((prev) => prev.filter((l) => l !== url));
     };
 
+    const handlePublicar = async () => {
+      if (!titulo.trim() || !texto.trim() || !tags[0]) {
+        alert("Por favor, preencha título, texto e selecione uma tag.");
+        return;
+      }
+
+      try {
+        const autorId = localStorage.getItem("userId") || "";
+        const payload = {
+          titulo: titulo.trim(),
+          texto: texto.trim(),
+          tag: tags[0],
+          autorId,
+        };
+
+        await api.post("/postagens", payload);
+        alert("Publicação criada com sucesso!");
+        setTitulo("");
+        setTexto("");
+        setTags([]);
+        setLinks([]);
+        setLinkInput("");
+        
+        // Recarregar postagens
+        const res = await api.get("/postagens");
+        const arr = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
+        setPosts(arr);
+      } catch (error: any) {
+        console.error("Erro ao publicar:", error);
+        alert(error.response?.data?.message || "Erro ao criar publicação.");
+      }
+    };
+
+
     const renderLinkBadge = (url: string) => {
       const isGithub = url.includes("github.com");
+      const label = formatLinkLabel(url);
       return (
         <LinkBadge href={url} target="_blank" rel="noopener noreferrer">
           <img
-            src={isGithub ? GithubIcon : PdfIcon}
-            alt={isGithub ? "GitHub" : "PDF"}
+            src={isGithub ? GithubIcon : IconLink}
+            alt={isGithub ? "GitHub" : "Link"}
             style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
           />
-          {url.replace('https://', '')}
+          {label}
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); removeLink(url); }}
@@ -130,33 +238,6 @@ const Feed: React.FC = () => {
         </LinkBadge>
       );
     };
-
-/* AQUI TERÁ QUE SER AJUSTADO PARA COLOCAR OS ATRIBUTOS DA API DE POSTS */
-  const initialPosts = [
-    {
-      id: 1,
-      author: "Laura Ribeiro",
-      year: 2019,
-      title: "Diagnóstico por Imagem - Dataset Câncer Bucal",
-      text: "Neste trabalho, explorei o uso de técnicas de visão computacional aplicadas ao diagnóstico de câncer bucal, utilizando um dataset composto por imagens clínicas reais...",
-      tag: "Diagnóstico por Imagem",
-      github: "https://github.com/RafaelaLaura",
-      pdf: null,
-    },
-    {
-      id: 2,
-      author: "Bianca Siega",
-      year: 2019,
-      title:
-        "Análise de Imagens de Ultrassom Dermatológico Usando DenseNet121 e Transfer Learning",
-      text: "Abstract—Artificial intelligence has revolutionized medicine, particularly in the automated analysis of medical images...",
-      tag: "Diagnóstico por Imagem",
-      github: "https://github.com/biancasb",
-      pdf: "DenseNet121BiancaSiega.pdf",
-    },
-  ];
-
-  const [posts, setPosts] = useState(initialPosts);
 
   const handleDeletePost = (id: number) => {
     const ok = window.confirm("Tem certeza que deseja excluir este post?");
@@ -191,10 +272,23 @@ const Feed: React.FC = () => {
     </UserCard>
   );
 
-  const renderComposer = () => (
+  const renderComposer = () => {
+    const isFormValid = titulo.trim() !== "" && texto.trim() !== "" && tags.length > 0;
+    
+    return (
     <ComposerCard>
-      <ComposerInputTitle placeholder="Título da publicação" />
-      <ComposerInputBody placeholder="Comece uma publicação" />
+      <ComposerInputTitle 
+        placeholder="Título da publicação" 
+        maxLength={120}
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
+      />
+      <ComposerInputBody 
+        placeholder="Comece uma publicação" 
+        maxLength={500}
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+      />
       <ComposerLinksRow>
         <ComposerLinkInput
           type="url"
@@ -202,21 +296,34 @@ const Feed: React.FC = () => {
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
           onKeyDown={handleLinkKeyDown}
+          disabled={Boolean(links[0])}
+          title={links[0] ? "Remova o link para adicionar outro" : undefined}
         />
-        {links.map((url) => (
-          <React.Fragment key={url}>{renderLinkBadge(url)}</React.Fragment>
-        ))}
+        {links[0] && (
+          <React.Fragment key={links[0]}>{renderLinkBadge(links[0])}</React.Fragment>
+        )}
       </ComposerLinksRow>
       <ComposerTagsRow>
             <ComposerTagFake>
               <ComposerTagInput
                 type="text"
-                placeholder={tags.length ? "Adicionar outra tag" : "Escolha suas tags"}
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagKeyDown}
+                placeholder={tags.length ? "Tag selecionada" : "Escolha sua tag"}
+                value={tags[0] || ""}
+                readOnly
+                onClick={onTagFocus}
+                onFocus={onTagFocus}
+                onBlur={onTagBlur}
               />
             </ComposerTagFake>
+            {showSuggestions && (
+              <SuggestionsList>
+                {filteredMaterias.map((m) => (
+                  <SuggestionItem key={m} onClick={() => addTag(m)}>
+                    {m}
+                  </SuggestionItem>
+                ))}
+              </SuggestionsList>
+            )}
         {tags.map((tag) => (
           <ComposerTagPill key={tag}>
             {tag}
@@ -231,48 +338,63 @@ const Feed: React.FC = () => {
       </ComposerTagsRow>
       <ComposerActions>
         <div />
-        <ComposerPublishButton>Publicar</ComposerPublishButton>
+        <ComposerPublishButton 
+          onClick={handlePublicar}
+          disabled={!isFormValid}
+          style={{ opacity: isFormValid ? 1 : 0.5, cursor: isFormValid ? 'pointer' : 'not-allowed' }}
+        >
+          Publicar
+        </ComposerPublishButton>
       </ComposerActions>
     </ComposerCard>
-  );
+    );
+  };
 
   const renderPosts = () => (
     <>
-      {posts.map((post) => (
-        <PostCard key={post.id}>
+      {isLoadingPosts && <div style={{ padding: 20, textAlign: 'center' }}>Carregando postagens...</div>}
+      {posts.map((post) => {
+        const postId = post._id || post.id;
+        // Buscar nome do autor em diferentes estruturas possíveis
+        const authorName = post.autorId?.nome || post.autor?.nome || post.author || "Usuário Anônimo";
+        // Buscar ano de ingresso em diferentes estruturas possíveis
+        const authorYear = post.autorId?.anoIngresso || post.autor?.anoIngresso || post.year || new Date().getFullYear();
+        
+        return (
+        <PostCard key={postId}>
           <PostDeleteButton
             type="button"
-            aria-label={`Excluir post ${post.id}`}
+            aria-label={`Excluir post ${postId}`}
             title="Excluir publicação"
-            onClick={() => handleDeletePost(post.id)}
+            onClick={() => handleDeletePost(postId)}
           >
             <DeleteOutlineIcon style={{ fontSize: 18 }} />
           </PostDeleteButton>
           <PostHeader>
             <PostAvatarSmall>
-              <AppAvatar name={post.author} size={36} />
+              <AppAvatar name={authorName} size={36} />
             </PostAvatarSmall>
             <PostHeaderInfo>
-              <PostHeaderName>{post.author}</PostHeaderName>
+              <PostHeaderName>{authorName}</PostHeaderName>
               <PostHeaderMeta>
                 <GraduationIcon>
                   <img src={GraduationIconImg} alt="Graduação" />
                 </GraduationIcon>
-                Ingresso em {post.year}
+                Ingresso em {authorYear}
               </PostHeaderMeta>
             </PostHeaderInfo>
           </PostHeader>
-          <PostTitle>{post.title}</PostTitle>
-          <PostText>{post.text}</PostText>
+          <PostTitle>{post.titulo || post.title}</PostTitle>
+          <PostText>{post.texto || post.text}</PostText>
           <PostTagRow>
             <PostTag>{post.tag}</PostTag>
           </PostTagRow>
           <PostFooter>
             <button
               type="button"
-              aria-label={likedPosts[post.id] ? "Descurtir" : "Curtir"}
-              data-liked={likedPosts[post.id] ? "true" : "false"}
-              onClick={() => togglePostLike(post.id)}
+              aria-label={likedPosts[postId] ? "Descurtir" : "Curtir"}
+              data-liked={likedPosts[postId] ? "true" : "false"}
+              onClick={() => togglePostLike(postId)}
               style={{
                 background: 'transparent',
                 border: '1px solid #e5e7eb',
@@ -284,32 +406,34 @@ const Feed: React.FC = () => {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 marginRight: 12,
-                color: likedPosts[post.id] ? '#305a93' : '#5FA5CE',
+                color: likedPosts[postId] ? '#305a93' : '#5FA5CE',
                 transition: 'all 0.2s'
               }}
             >
-              {likedPosts[post.id] ? (
+              {likedPosts[postId] ? (
                 <FavoriteIcon fontSize="small" />
               ) : (
                 <FavoriteBorderIcon fontSize="small" />
               )}
             </button>
-            <GithubLink
-              href={post.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={GithubIcon}
-                alt="GitHub"
-                style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
-              />
-              {post.github.replace('https://', '')}
-            </GithubLink>
+            {(post.github || post.link) && (
+              <GithubLink
+                href={post.github || post.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={GithubIcon}
+                  alt="GitHub"
+                  style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
+                />
+                {formatLinkLabel(post.github || post.link)}
+              </GithubLink>
+            )}
             {post.pdf && (
               <PdfBadge>
                 <img
-                  src={PdfIcon}
+                  src={IconLink}
                   alt="PDF Icon"
                   style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
                 />
@@ -318,7 +442,8 @@ const Feed: React.FC = () => {
             )}
           </PostFooter>
         </PostCard>
-      ))}
+        );
+      })}
     </>
   );
 

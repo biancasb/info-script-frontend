@@ -57,6 +57,10 @@ const Register: React.FC = () => {
       if (res.data?.token) {
         localStorage.setItem("auth_token", res.data.token);
       }
+      if (res.data?.userId || res.data?.id || res.data?._id) {
+        const userId = res.data.userId || res.data.id || res.data._id;
+        localStorage.setItem("userId", userId);
+      }
       setRegister(res.data);
       navigate("/feed");
     } catch (err: any) {

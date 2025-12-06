@@ -40,8 +40,11 @@ const Login: React.FC = () => {
     try {
       const u = { nickname, senha };
       const res = await api.post(`/usuarios/login`, u);
-      if (res.data?.token) {//salvar o token no localStorage
+      if (res.data?.token) {
         localStorage.setItem("auth_token", res.data.token);
+      }
+      if (res.data?.user?._id) {
+        localStorage.setItem("userId", res.data.user._id);
       }
       setProfile(res.data);
       navigate("/feed");

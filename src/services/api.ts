@@ -10,7 +10,6 @@ export const api = axios.create({
   },
 });
 
-// Optional: attach auth token from localStorage
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("auth_token");
   if (token) {
@@ -20,7 +19,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Optional: global error handling
 api.interceptors.response.use(
   (res) => res,
   (err) => {

@@ -325,6 +325,13 @@ export const ComposerLinkInput = styled.input`
   &::placeholder {
     color: ${Colors.infoScriptTextSecondary};
   }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f3f4f6;
+    border-color: #cbd5e1;
+  }
 `;
 
 export const LinkBadge = styled.a`
@@ -393,6 +400,37 @@ export const RemoveTagButton = styled.button`
   cursor: pointer;
   padding: 0;
   line-height: 1;
+`;
+
+export const SuggestionsList = styled.ul`
+  position: absolute;
+  top: ${Layout.normalize(36)}px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: ${Colors.commonWhite};
+  border: 1px solid #e5e7eb;
+  border-radius: ${Layout.normalize(12)}px;
+  box-shadow: 0 12px 24px rgba(15,23,42,0.12);
+  list-style: none;
+  margin: 0;
+  padding: ${Layout.normalize(6)}px;
+  display: flex;
+  flex-direction: column;
+  gap: ${Layout.normalize(4)}px;
+`;
+
+export const SuggestionItem = styled.li`
+  padding: ${Layout.normalize(8)}px ${Layout.normalize(10)}px;
+  border-radius: ${Layout.normalize(8)}px;
+  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.normalize(12)}px;
+  color: ${Colors.infoScriptTextPrimary};
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f4f6;
+  }
 `;
 
 export const ComposerActions = styled.div`
