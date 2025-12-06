@@ -82,7 +82,7 @@ const Feed: React.FC = () => {
     const [titulo, setTitulo] = useState("");
     const [texto, setTexto] = useState("");
     const [tags, setTags] = useState<string[]>([]);
-    const [links, setLinks] = useState<string[]>([]);
+    const [link, setLink] = useState("");
     const [linkInput, setLinkInput] = useState("");
     const [materias, setMaterias] = useState<string[]>([]);
     const [filteredMaterias, setFilteredMaterias] = useState<string[]>([]);
@@ -168,13 +168,13 @@ const Feed: React.FC = () => {
       if (event.key === "Enter" && linkInput.trim()) {
         event.preventDefault();
         const url = linkInput.trim();
-        setLinks([url]);
+        setLink(url);
         setLinkInput("");
       }
     };
 
-    const removeLink = (url: string) => {
-      setLinks((prev) => prev.filter((l) => l !== url));
+    const removeLink = () => {
+      setLink("");
     };
 
     const handlePublicar = async () => {
@@ -185,23 +185,30 @@ const Feed: React.FC = () => {
 
       try {
         const autorId = localStorage.getItem("userId") || "";
-        const payload = {
+        const payload: any = {
           titulo: titulo.trim(),
           texto: texto.trim(),
           tag: tags[0],
           autorId,
         };
+        
+        if (link) {
+          payload.link = link;
+        }
 
-        await api.post("/postagens", payload);
+        console.log("Payload enviado:", payload);
+        const response = await api.post("/postagens", payload);
+        console.log("Resposta do POST:", response.data);
         alert("Publicação criada com sucesso!");
         setTitulo("");
         setTexto("");
         setTags([]);
-        setLinks([]);
+        setLink("");
         setLinkInput("");
         
         // Recarregar postagens
         const res = await api.get("/postagens");
+        console.log("Postagens recebidas:", res.data);
         const arr = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
         setPosts(arr);
       } catch (error: any) {
@@ -211,11 +218,11 @@ const Feed: React.FC = () => {
     };
 
 
-    const renderLinkBadge = (url: string) => {
-      const isGithub = url.includes("github.com");
-      const label = formatLinkLabel(url);
+    const renderLinkBadge = () => {
+      const isGithub = link.includes("github.com");
+      const label = formatLinkLabel(link);
       return (
-        <LinkBadge href={url} target="_blank" rel="noopener noreferrer">
+        <LinkBadge href={link} target="_blank" rel="noopener noreferrer">
           <img
             src={isGithub ? GithubIcon : IconLink}
             alt={isGithub ? "GitHub" : "Link"}
@@ -224,7 +231,7 @@ const Feed: React.FC = () => {
           {label}
           <button
             type="button"
-            onClick={(e) => { e.preventDefault(); removeLink(url); }}
+            onClick={(e) => { e.preventDefault(); removeLink(); }}
             style={{
               border: 'none',
               background: 'transparent',
@@ -296,11 +303,11 @@ const Feed: React.FC = () => {
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
           onKeyDown={handleLinkKeyDown}
-          disabled={Boolean(links[0])}
-          title={links[0] ? "Remova o link para adicionar outro" : undefined}
+          disabled={Boolean(link)}
+          title={link ? "Remova o link para adicionar outro" : undefined}
         />
-        {links[0] && (
-          <React.Fragment key={links[0]}>{renderLinkBadge(links[0])}</React.Fragment>
+        {link && (
+          <React.Fragment key={link}>{renderLinkBadge()}</React.Fragment>
         )}
       </ComposerLinksRow>
       <ComposerTagsRow>
@@ -355,10 +362,8 @@ const Feed: React.FC = () => {
       {isLoadingPosts && <div style={{ padding: 20, textAlign: 'center' }}>Carregando postagens...</div>}
       {posts.map((post) => {
         const postId = post._id || post.id;
-        // Buscar nome do autor em diferentes estruturas possíveis
-        const authorName = post.autorId?.nome || post.autor?.nome || post.author || "Usuário Anônimo";
-        // Buscar ano de ingresso em diferentes estruturas possíveis
-        const authorYear = post.autorId?.anoIngresso || post.autor?.anoIngresso || post.year || new Date().getFullYear();
+        const authorName = post.autorNome;
+        const authorYear = post.anoIngresso || new Date().getFullYear();
         
         return (
         <PostCard key={postId}>
@@ -416,25 +421,25 @@ const Feed: React.FC = () => {
                 <FavoriteBorderIcon fontSize="small" />
               )}
             </button>
-            {(post.github || post.link) && (
+            {post.link && (
               <GithubLink
-                href={post.github || post.link}
+                href={post.link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <img
-                  src={GithubIcon}
-                  alt="GitHub"
+                  src={post.link.includes('github.com') ? GithubIcon : IconLink}
+                  alt={post.link.includes('github.com') ? "GitHub" : "Link"}
                   style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
                 />
-                {formatLinkLabel(post.github || post.link)}
+                {formatLinkLabel(post.link)}
               </GithubLink>
             )}
             {post.pdf && (
               <PdfBadge>
                 <img
                   src={IconLink}
-                  alt="PDF Icon"
+                  alt="link Icon"
                   style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
                 />
                 <PdfBadgeText>{post.pdf}</PdfBadgeText>
