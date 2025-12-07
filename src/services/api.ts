@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Base URL from Vite env or default
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const api = axios.create({
@@ -22,7 +21,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // You can add toast/redirect logic here
     return Promise.reject(err);
   }
 );

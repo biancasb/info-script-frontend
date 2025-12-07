@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoInfo from "../../assets/images/infoScript.png";
-import api from "@/services/api";
+
 import { validateRegisterFull, isValidFullName, isValidUsername, isValidPassword } from "@/utils/validators";
+import api from "@/services/api";
 
 import {
   RegisterWrapper,
@@ -18,6 +18,8 @@ import {
   HelperText,
   Backdrop,
 } from "./styles";
+
+import LogoInfo from "../../assets/images/infoScript.png";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +39,6 @@ const Register: React.FC = () => {
 
   const currentYear = new Date().getFullYear();
 
-  // Validação em tempo real para nome
   const handleNomeChange = (value: string) => {
     setNome(value);
     setError("");
@@ -54,7 +55,6 @@ const Register: React.FC = () => {
     }
   };
 
-  // Validação em tempo real para ano
   const handleAnoIngressoChange = (value: string) => {
     const onlyDigits = value.replace(/\D/g, "").slice(0, 4);
     setAnoIngresso(onlyDigits);
@@ -80,7 +80,6 @@ const Register: React.FC = () => {
     }
   };
 
-  // Validação em tempo real para nickname
   const handleNicknameChange = (value: string) => {
     setNickname(value);
     setError("");
@@ -97,7 +96,6 @@ const Register: React.FC = () => {
     }
   };
 
-  // Validação em tempo real para senha
   const handleSenhaChange = (value: string) => {
     setSenha(value);
     setError("");
@@ -133,7 +131,10 @@ const Register: React.FC = () => {
 
     try {
       const registrationData = { nome, nickname, senha, anoIngresso: parseInt(anoIngresso, 10) };
+      console.log("Enviando para cadastro:", registrationData);
       const response = await api.post(`/usuarios`, registrationData);
+      console.log("Resposta do servidor:", response.data);
+      
       if (response.data?.token) {
         localStorage.setItem("auth_token", response.data.token);
       }
@@ -141,8 +142,16 @@ const Register: React.FC = () => {
         const userId = response.data.userId || response.data.id || response.data._id;
         localStorage.setItem("userId", userId);
       }
+      if (response.data?.nickname) {
+        localStorage.setItem("userName", response.data.nickname);
+      } else {
+        localStorage.setItem("userName", nickname);
+      }
       setRegister(response.data);
-      navigate("/feed");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 500);
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "Falha ao criar conta. Verifique os dados e tente novamente.";
       setError(errorMessage);

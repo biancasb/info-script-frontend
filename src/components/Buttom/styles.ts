@@ -14,19 +14,19 @@ const getButtonSize = (size?: string) => {
   switch (size) {
     case "small":
       return css`
-        padding: ${Layout.normalize(8)}px ${Layout.normalize(16)}px;
-        font-size: ${Layout.normalize(13)}px;
+        padding: ${Layout.infoScriptNormalize(8)}px ${Layout.infoScriptNormalize(16)}px;
+        font-size: ${Layout.infoScriptNormalize(13)}px;
       `;
     case "medium":
       return css`
-        padding: ${Layout.normalize(12)}px ${Layout.normalize(20)}px;
-        font-size: ${Layout.normalize(14)}px;
+        padding: ${Layout.infoScriptNormalize(12)}px ${Layout.infoScriptNormalize(20)}px;
+        font-size: ${Layout.infoScriptNormalize(14)}px;
       `;
     case "large":
     default:
       return css`
-        padding: ${Layout.normalize(16)}px ${Layout.normalize(24)}px;
-        font-size: ${Layout.normalize(16)}px;
+        padding: ${Layout.infoScriptNormalize(16)}px ${Layout.infoScriptNormalize(24)}px;
+        font-size: ${Layout.infoScriptNormalize(16)}px;
       `;
   }
 };
@@ -38,9 +38,9 @@ const getButtonVariant = (variant?: string) => {
   switch (variant) {
     case "secondary":
       return css`
-        background: ${Colors.commonWhite};
+        background: ${Colors.infoScriptCommonWhite};
         color: ${Colors.infoScriptPrimary};
-        border: ${Layout.normalize(2)}px solid ${Colors.infoScriptPrimary};
+        border: ${Layout.infoScriptNormalize(2)}px solid ${Colors.infoScriptPrimary};
 
         &:hover {
           background: ${Colors.infoScriptPrimarySoft};
@@ -50,7 +50,7 @@ const getButtonVariant = (variant?: string) => {
     default:
       return css`
         background: ${Colors.infoScriptPrimary};
-        color: ${Colors.commonWhite};
+        color: ${Colors.infoScriptCommonWhite};
 
         &:hover {
           opacity: 0.9;
@@ -62,8 +62,8 @@ const getButtonVariant = (variant?: string) => {
 export const ButtonWrapper = styled.button<ButtonWrapperProps>`
   border: none;
   cursor: pointer;
-  border-radius: ${Layout.normalize(50)}px;
-  font-family: ${Typography.fontFamilyBold};
+  border-radius: ${Layout.infoScriptNormalize(50)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,7 +88,7 @@ export const ButtonWrapper = styled.button<ButtonWrapperProps>`
 
   &:disabled {
     background: ${Colors.infoScriptDisabled};
-    color: ${Colors.commonWhite};
+    color: ${Colors.infoScriptCommonWhite};
     cursor: not-allowed;
     opacity: 0.7;
     transform: none;

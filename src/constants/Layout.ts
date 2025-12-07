@@ -1,8 +1,9 @@
 export default {
-  xsGutter: 4,
-  smGutter: 8,
-  mdGutter: 16,
-  lgGutter: 24,
+  infoScriptGutterXS: 4,
+  infoScriptGutterSM: 8,
+  infoScriptGutterMD: 16,
+  infoScriptGutterLG: 24,
+  infoScriptGutterXL: 32,
 
-  normalize: (size: number) => size,
+  infoScriptNormalize: (size: number) => size,
 };

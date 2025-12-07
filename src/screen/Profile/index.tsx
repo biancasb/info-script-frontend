@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import api from "../../services/api";
+import { useParams, useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import GraduationIconImg from "../../assets/icons/graduation.svg";
+import Icon from "@mdi/react";
+import { mdiLink } from "@mdi/js";
+
+import { getCurrentUsername, getCurrentUserName, getCurrentUserYear } from "../../utils/auth";
+import api from "../../services/api";
+
 import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
 import Footer from "../../components/Footer";
-import GithubIcon from "../../assets/images/github-mark.png";
-import PdfIcon from "../../assets/images/pdf.png";
-import { getCurrentUsername, getCurrentUserName, getCurrentUserYear } from "../../utils/auth";
 
 import {
   ProfileWrapper,
@@ -23,10 +24,6 @@ import {
   GraduationIcon,
   ProfileSubtitle,
   FollowButton,
-  AboutSection,
-  AboutTitle,
-  AboutText,
-  AboutHighlight,
   TagsSection,
   TagsRow,
   TagLabel,
@@ -46,41 +43,48 @@ import {
   PublicationLinksRow,
 } from "./styles";
 
+import GraduationIconImg from "../../assets/icons/graduation.svg";
+import GithubIcon from "../../assets/images/github-mark.png";
+import PdfIcon from "../../assets/images/pdf.png";
+
 const Profile: React.FC = () => {
   const [likedById, setLikedById] = useState<Record<number, boolean>>({});
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [publications, setPublications] = useState<any[]>([]);
   const { username } = useParams();
-  
-  // Pega dados do usuário logado do JWT
+  const navigate = useNavigate();
+
   const currentUserUsername = getCurrentUsername();
   const currentUserName = getCurrentUserName();
   const currentUserYear = getCurrentUserYear();
   const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername?.toLowerCase();
 
+  console.log("Profile Debug:", {
+    usernameFromURL: username,
+    currentUserUsername,
+    isOwnProfile
+  });
+
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        setLoading(true);
         const u = username || currentUserUsername;
         if (!u) {
           console.warn("Usuário não identificado");
           return;
         }
+        console.log("Carregando perfil para:", u);
         const response = await api.get(`/profiles/${u}`);
+        console.log("Perfil carregado:", response.data);
         setUserProfile(response.data);
       } catch (e) {
         console.warn("Falha ao carregar perfil", e);
-      } finally {
-        setLoading(false);
       }
     };
     loadProfile();
-  }, [username, currentUserUsername]);
+    }, [username, currentUserUsername]);
 
-  // Carrega publicações do usuário
   useEffect(() => {
     const loadUserPublications = async () => {
       try {
@@ -93,7 +97,6 @@ const Profile: React.FC = () => {
           : Array.isArray(payload?.data)
             ? payload.data
             : [];
-        // Mapeia para o formato esperado
         const mapped = arr.map((post: any) => ({
           id: post._id || post.id,
           title: post.titulo || post.title,
@@ -104,6 +107,7 @@ const Profile: React.FC = () => {
           author: userProfile?.nome || currentUserName || "Usuário",
           github: post.github || null,
           pdf: post.pdf || null,
+          link: post.link || null,
         }));
         setPublications(mapped);
       } catch (e) {
@@ -140,12 +144,10 @@ const Profile: React.FC = () => {
   );
 
   const renderTagsSection = () => {
-    // Extrai tags únicas das publicações do usuário
     const uniqueTags = Array.from(
       new Set(publications.map((pub) => pub.tag).filter(Boolean))
     );
 
-    // Se não há publicações, não mostra tags
     if (uniqueTags.length === 0) return null;
 
     return (
@@ -165,22 +167,91 @@ const Profile: React.FC = () => {
     );
   };
 
-  const renderPublicationsSection = () => (
-    <PublicationsSection>
-        {publications
-          .filter((pub) => {
-            if (!selectedTag) return true;
-            if (pub.tag && pub.tag === selectedTag) return true;
-            return (pub.tags || []).includes(selectedTag);
-          })
-          .map((pub) => (
-            <PublicationCard key={pub.id}>
+  const renderPublicationsSection = () => {
+    const filteredPubs = publications.filter((pub) => {
+      if (!selectedTag) return true;
+      if (pub.tag && pub.tag === selectedTag) return true;
+      return (pub.tags || []).includes(selectedTag);
+    });
+
+    if (filteredPubs.length === 0) {
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 20px',
+          textAlign: 'center',
+          flex: 1
+        }}>
+          <h2 style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: '#1f2937',
+            marginBottom: '16px'
+          }}>
+            Compartilhe seus projetos e conhecimentos
+          </h2>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            maxWidth: '500px',
+            lineHeight: '1.6',
+            marginBottom: '32px'
+          }}>
+            Publique seus projetos acadêmicos, trabalhos, pesquisas e conteúdos que desenvolveu durante sua trajetória na faculdade. Compartilhe conhecimentos, experiências e inspire outros alunos!
+          </p>
+          {isOwnProfile && (
+            <button
+              onClick={() => navigate('/feed')}
+              style={{
+                padding: '12px 32px',
+                fontSize: '16px',
+                fontWeight: '500',
+                color: '#5FA5CE',
+                background: 'transparent',
+                border: '2px solid #5FA5CE',
+                borderRadius: '999px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = '#5FA5CE';
+                (e.currentTarget as HTMLButtonElement).style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                (e.currentTarget as HTMLButtonElement).style.color = '#5FA5CE';
+              }}
+            >
+              Começar
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <PublicationsSection>
+        {filteredPubs.map((pub) => (
+          <PublicationCard key={pub.id}>
               {pub.image && <PublicationImage src={pub.image} alt={pub.title} />}
               <PublicationContent>
                 <PublicationTitle>{pub.title}</PublicationTitle>
-                  <PublicationDescription>{pub.description}</PublicationDescription>
-                {(pub.github || pub.pdf) && (
-                  <PublicationLinksRow align={pub.github && pub.pdf ? 'center' : 'left'}>
+                <PublicationDescription>{pub.description}</PublicationDescription>
+                {(pub.link || pub.github || pub.pdf) && (
+                  <PublicationLinksRow align={(pub.link && pub.github && pub.pdf) ? 'center' : 'left'}>
+                    {pub.link && (
+                      <GithubLink href={pub.link} target="_blank" rel="noopener noreferrer">
+                        {pub.link.includes('github.com') ? (
+                          <img src={GithubIcon} alt="GitHub" style={{ width: 18, height: 18, objectFit: 'contain', marginRight: 8 }} />
+                        ) : (
+                          <Icon path={mdiLink} size={0.75} style={{ marginRight: 8 }} />
+                        )}
+                        <span>{pub.link.replace(/^https?:\/\//, '')}</span>
+                      </GithubLink>
+                    )}
                     {pub.github && (
                       <GithubLink href={pub.github} target="_blank" rel="noopener noreferrer">
                         <img src={GithubIcon} alt="GitHub" style={{ width: 18, height: 18, objectFit: 'contain', marginRight: 8 }} />
@@ -203,12 +274,13 @@ const Profile: React.FC = () => {
                   )}
                   {renderLikeButton(pub.id)}
                 </div>
-                <AuthorTag>- {pub.author}</AuthorTag>
+                <AuthorTag>{pub.author}</AuthorTag>
               </PublicationFooter>
             </PublicationCard>
           ))}
-      </PublicationsSection>
-  );
+        </PublicationsSection>
+    );
+  };
 
   const renderLikeButton = (id: number) => (
     <LikeButton

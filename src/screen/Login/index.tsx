@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoInfo from "../../assets/images/InfoScript.png";
+
+import { validateLogin, isValidUsername, isValidPassword } from "@/utils/validators";
+import api from "@/services/api";
 
 import {
   LoginWrapper,
@@ -18,8 +20,8 @@ import {
   HelperText,
   Backdrop,
 } from "./styles";
-import api from "@/services/api";
-import { validateLogin, isValidUsername, isValidPassword } from "@/utils/validators";
+
+import LogoInfo from "../../assets/images/InfoScript.png";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +32,6 @@ const Login: React.FC = () => {
 
   const [, setProfile] = useState<{ nickname: string; anoIngresso: number; tags: string[]; publications: any[] } | null>(null);
 
-  // Validação em tempo real para nickname
   const handleNicknameChange = (value: string) => {
     setNickname(value);
     setError("");
@@ -47,7 +48,6 @@ const Login: React.FC = () => {
     }
   };
 
-  // Validação em tempo real para senha
   const handleSenhaChange = (value: string) => {
     setSenha(value);
     setError("");
@@ -71,8 +71,7 @@ const Login: React.FC = () => {
     const validation = validateLogin(nickname, senha);
     if (!validation.success) {
       setErrors(validation.errors || {});
-      const errorMsg = validation.errors?.nickname || validation.errors?.senha || "Validação falhou";
-      setError(errorMsg);
+      setError("");
       return;
     }
 
@@ -84,6 +83,9 @@ const Login: React.FC = () => {
       }
       if (response.data?.user?._id) {
         localStorage.setItem("userId", response.data.user._id);
+      }
+      if (response.data?.user?.nickname) {
+        localStorage.setItem("userName", response.data.user.nickname);
       }
       setProfile(response.data);
       navigate("/feed");

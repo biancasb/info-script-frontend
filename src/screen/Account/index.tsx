@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import infoScriptLogo from "../../assets/images/infoScript.png";
-import logoGoogle from "../../assets/images/logo_google.png";
-type AuthMode = "login" | "register";
+
 import {
   AuthCard,
   AuthLogo,
@@ -18,10 +16,15 @@ import {
   GoogleIcon,
   SwitchText,
   LinkText,
-} from "./styles";  
+} from "./styles";
+
+import infoScriptLogo from "../../assets/images/infoScript.png";
+import logoGoogle from "../../assets/images/logo_google.png";
+
+type AuthMode = "login" | "register";  
 
 
-const Login: React.FC = () => {
+const Account: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>("login");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +33,6 @@ const Login: React.FC = () => {
   const handleLoginSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Login enviado!");
-
     setIsAuthenticated(true);
     navigate('/feed');
   };
@@ -38,7 +40,6 @@ const Login: React.FC = () => {
   const handleRegisterSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Cadastro enviado!");
-
     setIsAuthenticated(true);
     navigate('/feed');
   };
@@ -117,12 +118,16 @@ const Login: React.FC = () => {
     </AuthForm>
   );
 
+  const renderForm = () => (
+    isLogin ? renderLoginForm() : renderRegisterForm()
+  );
+
   return (
     <AuthCard>
       {renderLogo()}
-      {isLogin ? renderLoginForm() : renderRegisterForm()}
+      {renderForm()}
     </AuthCard>
   );
 };
 
-export default Login;
+export default Account;

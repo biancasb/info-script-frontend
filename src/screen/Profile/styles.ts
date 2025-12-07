@@ -3,14 +3,14 @@ import { Colors, Layout, Typography } from "@/constants";
 
 export const ProfileWrapper = styled.div`
   min-height: 100vh;
-  background: #dcdcdc;
+  background: ${Colors.infoScriptCommonWhite};
   display: flex;
   flex-direction: column;
 `;
 
 export const TopBar = styled.header`
   width: 100%;
-  padding: ${Layout.normalize(8)}px 0;
+  padding: ${Layout.infoScriptNormalize(8)}px 0;
   display: flex;
   justify-content: center;
 `;
@@ -19,9 +19,9 @@ export const TopBarContent = styled.div`
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  background: #5FA5CE;
-  border-radius: ${Layout.normalize(24)}px;
-  padding: 0 ${Layout.normalize(24)}px;
+  background: ${Colors.infoScriptPrimarySoft};
+  border-radius: ${Layout.infoScriptNormalize(24)}px;
+  padding: 0 ${Layout.infoScriptNormalize(24)}px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,7 +31,7 @@ export const TopBarContent = styled.div`
 export const TopBarLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: ${Layout.normalize(16)}px;
+  gap: ${Layout.infoScriptNormalize(16)}px;
 `;
 
 export const TopBarRight = styled.div`
@@ -40,13 +40,13 @@ export const TopBarRight = styled.div`
 `;
 
 export const LogoWrapper = styled.div`
-  background: ${Colors.commonWhite};
-  border-radius: ${Layout.normalize(20)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  border-radius: ${Layout.infoScriptNormalize(20)}px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${Layout.normalize(150)}px;
-  height: ${Layout.normalize(75)}px;
+  width: ${Layout.infoScriptNormalize(150)}px;
+  height: ${Layout.infoScriptNormalize(75)}px;
   overflow: hidden;
   margin-left: -30px;
 `;
@@ -61,12 +61,12 @@ export const LogoImage = styled.img`
 export const SearchBar = styled.div`
   width: 100%;
   max-width: 520px;
-  height: ${Layout.normalize(44)}px;
-  background: ${Colors.commonWhite};
+  height: ${Layout.infoScriptNormalize(44)}px;
+  background: ${Colors.infoScriptCommonWhite};
   border-radius: 999px;
   display: flex;
   align-items: center;
-  padding: 0 ${Layout.normalize(16)}px;
+  padding: 0 ${Layout.infoScriptNormalize(16)}px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 `;
 
@@ -74,10 +74,10 @@ export const SearchIcon = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: ${Layout.normalize(18)}px;
-  height: ${Layout.normalize(18)}px;
+  width: ${Layout.infoScriptNormalize(18)}px;
+  height: ${Layout.infoScriptNormalize(18)}px;
   color: ${Colors.infoScriptTextInverse};
-  margin-right: ${Layout.normalize(10)}px;
+  margin-right: ${Layout.infoScriptNormalize(10)}px;
   
   img {
     display: block;
@@ -90,8 +90,8 @@ export const SearchInput = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  font-size: ${Layout.normalize(14)}px;
-  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
   color: ${Colors.infoScriptTextPrimary};
 
   &::placeholder {
@@ -102,8 +102,8 @@ export const SearchInput = styled.input`
 export const ContentWrapper = styled.main`
   max-width: 1200px;
   width: 100%;
-  margin: ${Layout.normalize(24)}px auto;
-  padding: 0 ${Layout.normalize(24)}px;
+  margin: ${Layout.infoScriptNormalize(24)}px auto;
+  padding: 0 ${Layout.infoScriptNormalize(24)}px;
 `;
 
 export const ProfileBanner = styled.div`
@@ -111,26 +111,26 @@ export const ProfileBanner = styled.div`
 `;
 
 export const ProfileHeaderSection = styled.div`
-  background: ${Colors.commonWhite};
-  padding: ${Layout.normalize(24)}px ${Layout.normalize(32)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  padding: ${Layout.infoScriptNormalize(24)}px ${Layout.infoScriptNormalize(32)}px;
   display: flex;
   align-items: center;
-  gap: ${Layout.normalize(20)}px;
-  border-radius: ${Layout.normalize(16)}px ${Layout.normalize(16)}px 0 0;
+  gap: ${Layout.infoScriptNormalize(20)}px;
+  border-radius: ${Layout.infoScriptNormalize(16)}px ${Layout.infoScriptNormalize(16)}px 0 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 `;
 
 export const ProfileAvatar = styled.div`
-  width: ${Layout.normalize(120)}px;
-  height: ${Layout.normalize(120)}px;
+  width: ${Layout.infoScriptNormalize(120)}px;
+  height: ${Layout.infoScriptNormalize(120)}px;
   border-radius: 50%;
-  background: ${Colors.commonWhite};
-  border: 4px solid ${Colors.commonWhite};
+  background: ${Colors.infoScriptCommonWhite};
+  border: 4px solid ${Colors.infoScriptCommonWhite};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(48)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(48)}px;
   color: ${Colors.infoScriptPrimary};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
@@ -145,28 +145,28 @@ export const ProfileAvatar = styled.div`
 
 export const ProfileInfo = styled.div`
   flex: 1;
-  padding-bottom: ${Layout.normalize(8)}px;
+  padding-bottom: ${Layout.infoScriptNormalize(8)}px;
 `;
 
 export const ProfileName = styled.h1`
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(32)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(32)}px;
   color: ${Colors.infoScriptPrimary};
-  margin: 0 0 ${Layout.normalize(4)}px 0;
+  margin: 0 0 ${Layout.infoScriptNormalize(4)}px 0;
 `;
 
 export const ProfileSubtitleRow = styled.div`
   display: flex;
   align-items: center;
-  gap: ${Layout.normalize(6)}px;
+  gap: ${Layout.infoScriptNormalize(6)}px;
 `;
 
 export const GraduationIcon = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: ${Layout.normalize(16)}px;
-  height: ${Layout.normalize(16)}px;
+  width: ${Layout.infoScriptNormalize(16)}px;
+  height: ${Layout.infoScriptNormalize(16)}px;
   opacity: 0.7;
 
   img {
@@ -177,48 +177,48 @@ export const GraduationIcon = styled.span`
 `;
 
 export const ProfileSubtitle = styled.span`
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(14)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
   color: ${Colors.infoScriptTextPrimary};
 `;
 
 export const FollowButton = styled.button`
-  background: #4a7ba7;
-  color: ${Colors.commonWhite};
+  background: ${Colors.infoScriptPrimaryHover};
+  color: ${Colors.infoScriptCommonWhite};
   border: none;
-  border-radius: ${Layout.normalize(8)}px;
-  padding: ${Layout.normalize(10)}px ${Layout.normalize(20)}px;
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(14)}px;
+  border-radius: ${Layout.infoScriptNormalize(8)}px;
+  padding: ${Layout.infoScriptNormalize(10)}px ${Layout.infoScriptNormalize(20)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
   cursor: pointer;
-  margin-bottom: ${Layout.normalize(8)}px;
+  margin-bottom: ${Layout.infoScriptNormalize(8)}px;
   transition: background 0.2s;
 
   &:hover {
-    background: #3d6689;
+    background: ${Colors.infoScriptAccentSecondary};
   }
 `;
 
 export const AboutSection = styled.div`
-  background: ${Colors.commonWhite};
-  padding: ${Layout.normalize(24)}px ${Layout.normalize(32)}px;
-  margin-top: ${Layout.normalize(2)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  padding: ${Layout.infoScriptNormalize(24)}px ${Layout.infoScriptNormalize(32)}px;
+  margin-top: ${Layout.infoScriptNormalize(2)}px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 `;
 
 export const AboutTitle = styled.h2`
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(16)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(16)}px;
   color: ${Colors.infoScriptTextPrimary};
-  margin: 0 0 ${Layout.normalize(12)}px 0;
+  margin: 0 0 ${Layout.infoScriptNormalize(12)}px 0;
 `;
 
 export const AboutText = styled.p`
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(14)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
   color: ${Colors.infoScriptTextPrimary};
   line-height: 1.6;
-  margin: 0 0 ${Layout.normalize(8)}px 0;
+  margin: 0 0 ${Layout.infoScriptNormalize(8)}px 0;
 
   &:last-child {
     margin-bottom: 0;
@@ -230,22 +230,22 @@ export const AboutText = styled.p`
 `;
 
 export const AboutHighlight = styled.strong`
-  font-family: ${Typography.fontFamilyBold};
+  font-family: ${Typography.infoScriptFontFamilyBold};
   color: ${Colors.infoScriptTextPrimary};
 `;
 
 export const TagsSection = styled.div`
-  background: ${Colors.commonWhite};
-  padding: ${Layout.normalize(20)}px ${Layout.normalize(32)}px;
-  margin-top: ${Layout.normalize(2)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  padding: ${Layout.infoScriptNormalize(20)}px ${Layout.infoScriptNormalize(32)}px;
+  margin-top: ${Layout.infoScriptNormalize(2)}px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 `;
 
 export const TagsRow = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${Layout.normalize(8)}px;
-  margin-bottom: ${Layout.normalize(8)}px;
+  gap: ${Layout.infoScriptNormalize(8)}px;
+  margin-bottom: ${Layout.infoScriptNormalize(8)}px;
 
   &:last-child {
     margin-bottom: 0;
@@ -254,19 +254,26 @@ export const TagsRow = styled.div`
 
 export const TagLabel = styled.span`
   display: inline-block;
-  background: #e8f2f7;
-  color: #4a7ba7;
-  padding: ${Layout.normalize(6)}px ${Layout.normalize(14)}px;
-  border-radius: ${Layout.normalize(6)}px;
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(13)}px;
-  border: 1px solid #d1e5f0;
+  background: ${Colors.infoScriptBackgroundTag};
+  color: ${Colors.infoScriptPrimaryHover};
+  padding: ${Layout.infoScriptNormalize(6)}px ${Layout.infoScriptNormalize(14)}px;
+  border-radius: ${Layout.infoScriptNormalize(6)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(13)}px;
+  border: 1px solid ${Colors.infoScriptBorderDashed};
   cursor: pointer;
   user-select: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${Colors.infoScriptBackgroundTagHover};
+    border-color: ${Colors.infoScriptBorderAccent};
+    transform: translateY(-2px);
+  }
 
   &[data-selected="true"] {
-    background: #d1e5f0;
-    border-color: #9fc1d6;
+    background: ${Colors.infoScriptBackgroundTagHover};
+    border-color: ${Colors.infoScriptBorderAccent};
   }
 `;
 
@@ -274,17 +281,25 @@ export const TagPill = styled.span`
   display: inline-block;
   background: ${Colors.infoScriptPrimarySoft};
   color: ${Colors.infoScriptPrimary};
-  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
-  border-radius: ${Layout.normalize(16)}px;
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(12)}px;
+  padding: ${Layout.infoScriptNormalize(6)}px ${Layout.infoScriptNormalize(12)}px;
+  border-radius: ${Layout.infoScriptNormalize(16)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(12)}px;
+  transition: all 0.2s ease;
+  cursor: default;
+
+  &:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 `;
 
 export const PublicationsSection = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${Layout.normalize(16)}px;
-  margin-top: ${Layout.normalize(16)}px;
+  gap: ${Layout.infoScriptNormalize(16)}px;
+  margin-top: ${Layout.infoScriptNormalize(16)}px;
+  padding-bottom: ${Layout.infoScriptNormalize(32)}px;
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
@@ -296,14 +311,15 @@ export const PublicationsSection = styled.div`
 `;
 
 export const PublicationCard = styled.div`
-  background: ${Colors.commonWhite};
-  border-radius: ${Layout.normalize(12)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  border-radius: ${Layout.infoScriptNormalize(12)}px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 2px solid transparent;
+  margin-bottom: ${Layout.infoScriptNormalize(16)}px;
 
   &:hover {
     transform: translateY(-4px);
@@ -314,24 +330,24 @@ export const PublicationCard = styled.div`
 
 export const PublicationImage = styled.img`
   width: 100%;
-  height: ${Layout.normalize(140)}px;
+  height: ${Layout.infoScriptNormalize(140)}px;
   object-fit: cover;
-  background: #f0f4f8;
+  background: ${Colors.infoScriptBackgroundGray};
 `;
 
 export const PublicationContent = styled.div`
-  padding: ${Layout.normalize(16)}px;
+  padding: ${Layout.infoScriptNormalize(16)}px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: ${Layout.normalize(8)}px;
+  gap: ${Layout.infoScriptNormalize(8)}px;
 `;
 
 export const PublicationTitle = styled.h3`
-  font-family: ${Typography.fontFamilyBold};
-  font-size: ${Layout.normalize(16)}px;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(16)}px;
   color: ${Colors.infoScriptPrimary};
-  margin: 0 0 ${Layout.normalize(10)}px 0;
+  margin: 0 0 ${Layout.infoScriptNormalize(10)}px 0;
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -341,8 +357,8 @@ export const PublicationTitle = styled.h3`
 `;
 
 export const PublicationDescription = styled.p`
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(13)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(13)}px;
   color: ${Colors.infoScriptTextPrimary};
   line-height: 1.5;
   margin: 0;
@@ -350,40 +366,43 @@ export const PublicationDescription = styled.p`
 `;
 
 export const PublicationFooter = styled.div`
-  padding: ${Layout.normalize(12)}px ${Layout.normalize(16)}px;
-  border-top: 1px solid #e5e7eb;
+  padding: ${Layout.infoScriptNormalize(12)}px ${Layout.infoScriptNormalize(16)}px;
+  border-top: 1px solid ${Colors.infoScriptBorderLight};
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: ${Layout.normalize(12)}px;
+  gap: ${Layout.infoScriptNormalize(12)}px;
 `;
 
 export const LikeButton = styled.button`
   background: transparent;
-  border: 1px solid #e5e7eb;
-  border-radius: ${Layout.normalize(6)}px;
-  width: ${Layout.normalize(36)}px;
-  height: ${Layout.normalize(36)}px;
+  border: none;
+  width: ${Layout.infoScriptNormalize(32)}px;
+  height: ${Layout.infoScriptNormalize(32)}px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-  color: ${Colors.infoScriptPrimary};
+  transition: color 0.2s ease, transform 0.2s ease;
+  color: ${Colors.infoScriptIconGray};
 
   &[data-liked="true"] {
-    color: #305a93;
+    color: ${Colors.infoScriptPrimaryDark};
   }
 
   &:hover {
-    background: #f0f4f8;
-    border-color: #4a7ba7;
+    color: ${Colors.infoScriptPrimaryDark};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
 export const AuthorTag = styled.span`
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(12)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(12)}px;
   color: ${Colors.infoScriptTextInverse};
   white-space: nowrap;
   flex-shrink: 0;
@@ -391,33 +410,33 @@ export const AuthorTag = styled.span`
 
 export const GithubLink = styled.a`
   border-radius: 999px;
-  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
-  border: 1px solid #e5e7eb;
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(12)}px;
+  padding: ${Layout.infoScriptNormalize(6)}px ${Layout.infoScriptNormalize(12)}px;
+  border: 1px solid ${Colors.infoScriptBorderLight};
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(12)}px;
   text-decoration: none;
   color: ${Colors.infoScriptTextPrimary};
   display: flex;
   align-items: center;
 
   &:hover {
-    background: #f3f4f6;
+    background: ${Colors.infoScriptBackgroundLight};
   }
 `;
 
 export const PdfBadge = styled.a`
   border-radius: 999px;
-  padding: ${Layout.normalize(6)}px ${Layout.normalize(12)}px;
-  border: 1px solid #e5e7eb;
-  font-family: ${Typography.fontFamilyRegular};
-  font-size: ${Layout.normalize(12)}px;
+  padding: ${Layout.infoScriptNormalize(6)}px ${Layout.infoScriptNormalize(12)}px;
+  border: 1px solid ${Colors.infoScriptBorderLight};
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(12)}px;
   text-decoration: none;
   color: ${Colors.infoScriptTextPrimary};
   display: flex;
   align-items: center;
 
   &:hover {
-    background: #f3f4f6;
+    background: ${Colors.infoScriptBackgroundLight};
   }
 `;
 
@@ -432,8 +451,32 @@ interface PublicationLinksRowProps {
 
 export const PublicationLinksRow = styled.div<PublicationLinksRowProps>`
   display: flex;
-  gap: ${Layout.normalize(12)}px;
+  gap: ${Layout.infoScriptNormalize(12)}px;
   justify-content: ${(p) => (p.align === 'center' ? 'center' : 'flex-start')};
   align-items: center;
-  margin-top: ${Layout.normalize(12)}px;
+  margin-top: ${Layout.infoScriptNormalize(12)}px;
+  flex-wrap: wrap;
+  max-width: 100%;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: 240px;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  a span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+  }
 `;

@@ -1,28 +1,39 @@
-import React from "react";
 
+import React from "react";
+import Colors from "@/constants/Colors";
 export interface AppAvatarProps {
   name: string;
-  size: number;
+  size: number | string;
   square?: boolean;
   variant?: string;
 }
 
 const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false }) => {
-  // Gera um seed baseado no nome para consistência
-  const seed = encodeURIComponent(name);
-  const avatarUrl = `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${seed}`;
+  const numericSize = typeof size === 'string' ? parseInt(size, 10) || 40 : size;
+  const initial = (name?.trim()?.charAt(0) || '?').toUpperCase();
+
+  const dimension = `${numericSize}px`;
+  const fontSize = `${Math.max(Math.round(numericSize * 0.45), 12)}px`;
 
   return (
-    <img
-      src={avatarUrl}
-      alt={name}
-      width={size}
-      height={size}
+    <div
       style={{
-        borderRadius: square ? "8px" : "50%",
-        objectFit: "cover",
+        width: dimension,
+        height: dimension,
+        borderRadius: square ? '12%' : '50%',
+        backgroundColor: Colors.infoScriptPrimarySoft,
+        color: Colors.infoScriptPrimaryDark,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 700,
+        fontSize,
+        lineHeight: 1,
+        userSelect: 'none',
       }}
-    />
+    >
+      {initial}
+    </div>
   );
 };
 

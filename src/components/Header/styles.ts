@@ -3,46 +3,58 @@ import { Colors, Layout, Typography } from "@/constants";
 
 export const TopBar = styled.header`
   width: 100%;
-  padding: ${Layout.normalize(8)}px 0;
+  padding: ${Layout.infoScriptNormalize(8)}px 0;
   display: flex;
   justify-content: center;
+  position: relative;
+  z-index: 100;
 `;
 
 export const TopBarContent = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  background: #5FA5CE;
-  border-radius: ${Layout.normalize(24)}px;
-  padding: 0 ${Layout.normalize(24)}px 0 0;
-  height: ${Layout.normalize(75)}px;
+  background: ${Colors.infoScriptPrimary};
+  border-radius: ${Layout.infoScriptNormalize(24)}px;
+  padding: 0 ${Layout.infoScriptNormalize(24)}px;
+  height: ${Layout.infoScriptNormalize(75)}px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+  gap: ${Layout.infoScriptNormalize(16)}px;
 `;
 
-export const TopBarLeft = styled.div`
+export const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: ${Layout.normalize(16)}px;
+  gap: ${Layout.infoScriptNormalize(12)}px;
+  min-width: fit-content;
 `;
 
-export const TopBarRight = styled.div`
+export const HeaderCenter = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 200px;
+`;
+
+export const HeaderRight = styled.div`
   display: flex;
   align-items: center;
+  gap: ${Layout.infoScriptNormalize(16)}px;
+  min-width: fit-content;
 `;
 
 export const LogoWrapper = styled.div`
-  background: ${Colors.commonWhite};
-  border-radius: ${Layout.normalize(20)}px;
+  background: ${Colors.infoScriptCommonWhite};
+  border-radius: ${Layout.infoScriptNormalize(16)}px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${Layout.normalize(150)}px;
-  height: ${Layout.normalize(75)}px;
+  width: ${Layout.infoScriptNormalize(60)}px;
+  height: ${Layout.infoScriptNormalize(60)}px;
   overflow: hidden;
-  margin-left: 0;
   cursor: pointer;
   transition: transform 0.2s;
 
@@ -52,34 +64,48 @@ export const LogoWrapper = styled.div`
 `;
 
 export const LogoImage = styled.img`
-  width: 50%;
+  width: 60%;
   height: auto;
   object-fit: contain;
   display: block;
 `;
 
+export const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+export const UserName = styled.span`
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
+  color: ${Colors.infoScriptCommonWhite};
+  white-space: nowrap;
+`;
+
 export const SearchBar = styled.div`
   width: 100%;
-  max-width: 520px;
-  height: ${Layout.normalize(44)}px;
-  background: ${Colors.commonWhite};
+  max-width: 420px;
+  height: ${Layout.infoScriptNormalize(44)}px;
+  background: ${Colors.infoScriptCommonWhite};
   border-radius: 999px;
   display: flex;
   align-items: center;
-  padding: 0 ${Layout.normalize(16)}px;
+  padding: 0 ${Layout.infoScriptNormalize(16)}px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  position: relative;
 `;
 
 export const SearchIcon = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: ${Layout.normalize(18)}px;
-  height: ${Layout.normalize(18)}px;
+  width: ${Layout.infoScriptNormalize(18)}px;
+  height: ${Layout.infoScriptNormalize(18)}px;
   color: ${Colors.infoScriptTextInverse};
-  margin-right: ${Layout.normalize(10)}px;
+  margin-right: ${Layout.infoScriptNormalize(10)}px;
   
-  img {
+  img, svg {
     display: block;
     opacity: 0.6;
   }
@@ -90,10 +116,9 @@ export const SearchInput = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  font-size: ${Layout.normalize(14)}px;
-  font-family: ${Typography.fontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
   color: ${Colors.infoScriptTextPrimary};
-  position: relative;
 
   &::placeholder {
     color: ${Colors.infoScriptTextInverse};
@@ -105,21 +130,21 @@ export const SearchHistoryContainer = styled.div`
   top: 100%;
   left: 0;
   right: 0;
-  background: ${Colors.commonWhite};
+  background: ${Colors.infoScriptCommonWhite};
   border-radius: 0 0 999px 999px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
   z-index: 10;
-  max-width: 520px;
   overflow: hidden;
+  margin-top: -8px;
 `;
 
 export const SearchHistoryItem = styled.div`
-  padding: ${Layout.normalize(12)}px ${Layout.normalize(16)}px;
+  padding: ${Layout.infoScriptNormalize(12)}px ${Layout.infoScriptNormalize(16)}px;
   cursor: pointer;
-  font-size: ${Layout.normalize(14)}px;
+  font-size: ${Layout.infoScriptNormalize(14)}px;
   color: ${Colors.infoScriptTextSecondary};
   transition: background 0.2s;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid ${Colors.infoScriptBorderLight};
 
   &:last-child {
     border-bottom: none;
@@ -130,4 +155,44 @@ export const SearchHistoryItem = styled.div`
     color: ${Colors.infoScriptPrimary};
   }
 `;
+
+export const MenuButton = styled.button`
+  background: transparent;
+  border: none;
+  color: ${Colors.infoScriptCommonWhite};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${Layout.infoScriptNormalize(8)}px;
+  transition: background 0.2s;
+  border-radius: ${Layout.infoScriptNormalize(8)}px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  svg {
+    display: block;
+  }
+`;
+
+export const AvatarButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${Layout.infoScriptNormalize(48)}px;
+  height: ${Layout.infoScriptNormalize(48)}px;
+  border-radius: 999px;
+  transition: background 0.2s;
+  padding: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+`;
+
 
