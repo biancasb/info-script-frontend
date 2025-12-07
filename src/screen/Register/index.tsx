@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoInfo from "../../assets/images/infoScript.png";
 import api from "@/services/api";
+import { validateRegisterFull, isValidFullName, isValidUsername, isValidPassword } from "@/utils/validators";
 
 import {
   RegisterWrapper,
@@ -25,47 +26,126 @@ const Register: React.FC = () => {
   const [nickname, setNickname] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{
+    nome?: string;
+    anoIngresso?: string;
+    nickname?: string;
+    senha?: string;
+  }>({});
 
-  // manter setter para uso futuro sem warning de variável não utilizada
   const [, setRegister] = useState<{ nome: string; anoIngresso: number; nickname: string; senha: string; token?: string } | null>(null);
-  
+
+  const currentYear = new Date().getFullYear();
+
+  // Validação em tempo real para nome
+  const handleNomeChange = (value: string) => {
+    setNome(value);
+    setError("");
+
+    if (!value) {
+      setErrors((prev) => ({ ...prev, nome: "" }));
+    } else if (!isValidFullName(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        nome: "Nome deve conter apenas letras e espaços (mínimo 2 caracteres)",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, nome: "" }));
+    }
+  };
+
+  // Validação em tempo real para ano
+  const handleAnoIngressoChange = (value: string) => {
+    const onlyDigits = value.replace(/\D/g, "").slice(0, 4);
+    setAnoIngresso(onlyDigits);
+    setError("");
+
+    if (!onlyDigits) {
+      setErrors((prev) => ({ ...prev, anoIngresso: "" }));
+    } else {
+      const year = parseInt(onlyDigits, 10);
+      if (isNaN(year)) {
+        setErrors((prev) => ({
+          ...prev,
+          anoIngresso: "Ano deve ser numérico",
+        }));
+      } else if (year < 2015 || year > currentYear) {
+        setErrors((prev) => ({
+          ...prev,
+          anoIngresso: `Ano deve estar entre 2015 e ${currentYear}`,
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, anoIngresso: "" }));
+      }
+    }
+  };
+
+  // Validação em tempo real para nickname
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
+    setError("");
+
+    if (!value) {
+      setErrors((prev) => ({ ...prev, nickname: "" }));
+    } else if (!isValidUsername(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        nickname: "Usuário deve ter 3-20 caracteres (letras, números, _ e -)",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, nickname: "" }));
+    }
+  };
+
+  // Validação em tempo real para senha
+  const handleSenhaChange = (value: string) => {
+    setSenha(value);
+    setError("");
+
+    if (!value) {
+      setErrors((prev) => ({ ...prev, senha: "" }));
+    } else if (!isValidPassword(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        senha: "Senha deve ter no mínimo 6 caracteres",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, senha: "" }));
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setError("");
+    e.preventDefault();
+    setError("");
 
-    const currentYear = new Date().getFullYear();
-    const yearNum = parseInt(anoIngresso, 10);
-
-    if (!nome || !anoIngresso || !nickname || !senha) {
-      setError("Preencha todos os campos");
-      return;
-    }
-
-    if (isNaN(yearNum)) {
-      setError("Ano de ingresso deve ser numérico (ex.: 2020)");
-      return;
-    }
-
-    if (yearNum < 2015 || yearNum > currentYear) {
-      setError(`Ano de ingresso deve ser entre 2015 e ${currentYear}`);
+    const validation = validateRegisterFull(nome, anoIngresso, nickname, senha);
+    if (!validation.success) {
+      setErrors(validation.errors || {});
+      const errorMsg =
+        validation.errors?.nome ||
+        validation.errors?.anoIngresso ||
+        validation.errors?.nickname ||
+        validation.errors?.senha ||
+        "Validação falhou";
+      setError(errorMsg);
       return;
     }
 
     try {
-      const u = { nome, nickname, senha, anoIngresso: yearNum };
-      const res = await api.post(`/usuarios`, u);
-      if (res.data?.token) {
-        localStorage.setItem("auth_token", res.data.token);
+      const registrationData = { nome, nickname, senha, anoIngresso: parseInt(anoIngresso, 10) };
+      const response = await api.post(`/usuarios`, registrationData);
+      if (response.data?.token) {
+        localStorage.setItem("auth_token", response.data.token);
       }
-      if (res.data?.userId || res.data?.id || res.data?._id) {
-        const userId = res.data.userId || res.data.id || res.data._id;
+      if (response.data?.userId || response.data?.id || response.data?._id) {
+        const userId = response.data.userId || response.data.id || response.data._id;
         localStorage.setItem("userId", userId);
       }
-      setRegister(res.data);
+      setRegister(response.data);
       navigate("/feed");
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Falha ao criar conta. Verifique os dados e tente novamente.";
-      setError(msg);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || "Falha ao criar conta. Verifique os dados e tente novamente.";
+      setError(errorMessage);
     }
   };
 
@@ -82,23 +162,23 @@ const Register: React.FC = () => {
           <Label>Nome</Label>
           <Input
             type="text"
-            placeholder="seu nome"
+            placeholder="seu nome completo"
             value={nome}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNomeChange(e.target.value)}
           />
+          {errors.nome && <ErrorMessage>{errors.nome}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
           <Label>Ano ingresso</Label>
           <Input
             type="text"
-            placeholder={new Date().getFullYear().toString()}
+            placeholder={currentYear.toString()}
             value={anoIngresso}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
-              setAnoIngresso(onlyDigits);
-            }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleAnoIngressoChange(e.target.value)}
+            maxLength={4}
           />
+          {errors.anoIngresso && <ErrorMessage>{errors.anoIngresso}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
@@ -107,18 +187,20 @@ const Register: React.FC = () => {
             type="text"
             placeholder="seu usuario"
             value={nickname}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNicknameChange(e.target.value)}
           />
+          {errors.nickname && <ErrorMessage>{errors.nickname}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
           <Label>Senha</Label>
           <Input
             type="password"
-            placeholder="sua senha"
+            placeholder="sua senha (mínimo 6 caracteres)"
             value={senha}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSenhaChange(e.target.value)}
           />
+          {errors.senha && <ErrorMessage>{errors.senha}</ErrorMessage>}
         </InputGroup>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}

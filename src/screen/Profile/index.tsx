@@ -10,6 +10,7 @@ import AppAvatar from "../../components/Avatar";
 import Footer from "../../components/Footer";
 import GithubIcon from "../../assets/images/github-mark.png";
 import PdfIcon from "../../assets/images/pdf.png";
+import { getCurrentUsername, getCurrentUserName, getCurrentUserYear } from "../../utils/auth";
 
 import {
   ProfileWrapper,
@@ -48,60 +49,73 @@ import {
 const Profile: React.FC = () => {
   const [likedById, setLikedById] = useState<Record<number, boolean>>({});
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [publications, setPublications] = useState<any[]>([]);
   const { username } = useParams();
-  const currentUserUsername = "bianca";
-  const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername;
+  
+  // Pega dados do usuário logado do JWT
+  const currentUserUsername = getCurrentUsername();
+  const currentUserName = getCurrentUserName();
+  const currentUserYear = getCurrentUserYear();
+  const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername?.toLowerCase();
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
+        setLoading(true);
         const u = username || currentUserUsername;
-        await api.get(`/profiles/${u}`);
+        if (!u) {
+          console.warn("Usuário não identificado");
+          return;
+        }
+        const response = await api.get(`/profiles/${u}`);
+        setUserProfile(response.data);
       } catch (e) {
         console.warn("Falha ao carregar perfil", e);
+      } finally {
+        setLoading(false);
       }
     };
     loadProfile();
-  }, [username]);
+  }, [username, currentUserUsername]);
+
+  // Carrega publicações do usuário
+  useEffect(() => {
+    const loadUserPublications = async () => {
+      try {
+        const u = username || currentUserUsername;
+        if (!u) return;
+        const response = await api.get(`/postagens?autor=${u}`);
+        const payload = response.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+        // Mapeia para o formato esperado
+        const mapped = arr.map((post: any) => ({
+          id: post._id || post.id,
+          title: post.titulo || post.title,
+          description: post.texto || post.text,
+          tag: post.tag,
+          tags: [post.tag],
+          image: post.image || null,
+          author: userProfile?.nome || currentUserName || "Usuário",
+          github: post.github || null,
+          pdf: post.pdf || null,
+        }));
+        setPublications(mapped);
+      } catch (e) {
+        console.warn("Falha ao carregar publicações do usuário", e);
+      }
+    };
+    loadUserPublications();
+  }, [username, currentUserUsername, userProfile?.nome]);
 
   const toggleLike = (id: number) => {
     setLikedById((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-  const publications = [
-    {
-      id: 1,
-      title: "Caderno de Imunologia",
-      description: "Todos meus resumos, esquemas e mapas mentais para dominar os sistemas de defesa do corpo! Foco nas células e mecanismos essenciais. 🔥🧬",
-      tag: "Imunologia",
-      tags: ["Imunologia"],
-      image: null,
-      author: "Bianca Siega",
-      github: null,
-      pdf: null,
-    },
-    {
-      id: 2,
-      title: "Artigo do IC",
-      description: "Minha primeira publicação científica! Detalhes sobre a aplicação de Machine Learning em Planos assistenciais de saúde. Confira o pôster apresentado no congresso UFCSPA! 🧠📊",
-      tag: "Diagnóstico por Imagem",
-      tags: ["Diagnóstico por Imagem"],
-      image: null,
-      author: "Bianca Siega",
-      github: "https://github.com/biancasb/ic-paper",
-      pdf: "Artigo_IC_Poster.pdf",
-    },
-    {
-      id: 3,
-      title: "Um código muito massa do workshop de Python!",
-      description: "Aprendi um Script em Python que transforma dados de exames em visualizações interativas. Compartilho com vcs a melhor forma de usar Matplot no contexto da saúde <3 📊",
-      tag: "Programação",
-      tags: ["Programação", "Python"],
-      image: null,
-      author: "Bianca Siega",
-      github: "https://github.com/biancasb/python-workshop",
-      pdf: null,
-    },
-  ];
 
   const handleTagClick = (tag: string) => {
     setSelectedTag((prev) => (prev === tag ? null : tag));
@@ -110,52 +124,46 @@ const Profile: React.FC = () => {
   const renderProfileHeader = () => (
     <ProfileHeaderSection>
       <ProfileAvatar>
-        <AppAvatar name="Bianca Siega" size={120} />
+        <AppAvatar name={userProfile?.nome || currentUserName || "Usuário"} size={120} />
       </ProfileAvatar>
       <ProfileInfo>
-        <ProfileName>Bianca Siega</ProfileName>
+        <ProfileName>{userProfile?.nome || currentUserName || "Usuário"}</ProfileName>
         <ProfileSubtitleRow>
           <GraduationIcon>
             <img src={GraduationIconImg} alt="Graduação" />
           </GraduationIcon>
-          <ProfileSubtitle>Ingresso em 2020, UFCSPA.</ProfileSubtitle>
+          <ProfileSubtitle>Ingresso em {userProfile?.anoIngresso || currentUserYear || "N/A"}, UFCSPA.</ProfileSubtitle>
         </ProfileSubtitleRow>
       </ProfileInfo>
       {!isOwnProfile && <FollowButton>+ Seguir</FollowButton>}
     </ProfileHeaderSection>
   );
 
-  const renderAboutSection = () => (
-    <AboutSection>
-      <AboutTitle>Sobre mim:</AboutTitle>
-      <AboutText>
-        Codificando o futuro da saúde! <AboutHighlight>🩺❤️</AboutHighlight> Sou a Bibs e estou imersa na InfoBio!
-      </AboutText>
-      <AboutText>
-        <AboutHighlight>Bem vindo a minha página:</AboutHighlight> Notas, resumos e flashcards bem estruturados. <em>Quer um material? Manda DM!</em>
-      </AboutText>
-    </AboutSection>
-  );
-/* MUDAR AQUI PARA ATRIBUTO DO ENDPOINT E FUNÇÃO UNICA */
-  const renderTagsSection = () => (
-    <TagsSection>
-      <TagsRow>
-        <TagLabel onClick={() => handleTagClick("Diagnóstico por Imagem")} data-selected={selectedTag === "Diagnóstico por Imagem"}>{"Diagnóstico por Imagem"}</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Cálculo II")} data-selected={selectedTag === "Cálculo II"}>Cálculo II</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Cálculo I")} data-selected={selectedTag === "Cálculo I"}>Cálculo I</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Imunologia")} data-selected={selectedTag === "Imunologia"}>Imunologia</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Bioinformática")} data-selected={selectedTag === "Bioinformática"}>Bioinformática</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Genética")} data-selected={selectedTag === "Genética"}>Genética</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Biotecnologia")} data-selected={selectedTag === "Biotecnologia"}>Biotecnologia</TagLabel>
-      </TagsRow>
-      <TagsRow>
-        <TagLabel onClick={() => handleTagClick("Tópicos Avançados em Informática Biomédica")} data-selected={selectedTag === "Tópicos Avançados em Informática Biomédica"}>Tópicos Avançados em Informática Biomédica</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Modelagem Molecular")} data-selected={selectedTag === "Modelagem Molecular"}>Modelagem Molecular</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Banco de Dados")} data-selected={selectedTag === "Banco de Dados"}>Banco de Dados</TagLabel>
-        <TagLabel onClick={() => handleTagClick("Redação Acadêmica")} data-selected={selectedTag === "Redação Acadêmica"}>Redação Acadêmica</TagLabel>
-      </TagsRow>
-    </TagsSection>
-  );
+  const renderTagsSection = () => {
+    // Extrai tags únicas das publicações do usuário
+    const uniqueTags = Array.from(
+      new Set(publications.map((pub) => pub.tag).filter(Boolean))
+    );
+
+    // Se não há publicações, não mostra tags
+    if (uniqueTags.length === 0) return null;
+
+    return (
+      <TagsSection>
+        <TagsRow>
+          {uniqueTags.map((tag) => (
+            <TagLabel
+              key={tag}
+              onClick={() => handleTagClick(tag)}
+              data-selected={selectedTag === tag}
+            >
+              {tag}
+            </TagLabel>
+          ))}
+        </TagsRow>
+      </TagsSection>
+    );
+  };
 
   const renderPublicationsSection = () => (
     <PublicationsSection>
@@ -219,12 +227,16 @@ const Profile: React.FC = () => {
 
   return (
     <ProfileWrapper>
-      <Header />
+      <Header
+        currentUser={{
+          name: userProfile?.nome || currentUserName || "Usuário",
+          initial: (userProfile?.nome || currentUserName || "U")?.charAt(0).toUpperCase(),
+        }}
+      />
 
       <PageContainer>
         <ProfileBanner />
         {renderProfileHeader()}
-        {renderAboutSection()}
         {renderTagsSection()}
         {renderPublicationsSection()}
         <Footer />

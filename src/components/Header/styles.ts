@@ -93,8 +93,41 @@ export const SearchInput = styled.input`
   font-size: ${Layout.normalize(14)}px;
   font-family: ${Typography.fontFamilyRegular};
   color: ${Colors.infoScriptTextPrimary};
+  position: relative;
 
   &::placeholder {
     color: ${Colors.infoScriptTextInverse};
   }
 `;
+
+export const SearchHistoryContainer = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: ${Colors.commonWhite};
+  border-radius: 0 0 999px 999px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  max-width: 520px;
+  overflow: hidden;
+`;
+
+export const SearchHistoryItem = styled.div`
+  padding: ${Layout.normalize(12)}px ${Layout.normalize(16)}px;
+  cursor: pointer;
+  font-size: ${Layout.normalize(14)}px;
+  color: ${Colors.infoScriptTextSecondary};
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: ${Colors.infoScriptPrimarySoft};
+    color: ${Colors.infoScriptPrimary};
+  }
+`;
+

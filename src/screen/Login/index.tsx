@@ -19,48 +19,85 @@ import {
   Backdrop,
 } from "./styles";
 import api from "@/services/api";
+import { validateLogin, isValidUsername, isValidPassword } from "@/utils/validators";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{ nickname?: string; senha?: string }>({});
 
   const [, setProfile] = useState<{ nickname: string; anoIngresso: number; tags: string[]; publications: any[] } | null>(null);
+
+  // Validação em tempo real para nickname
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
+    setError("");
+    
+    if (!value) {
+      setErrors((prev) => ({ ...prev, nickname: "" }));
+    } else if (!isValidUsername(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        nickname: "Usuário deve ter 3-20 caracteres (letras, números, _ e -)",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, nickname: "" }));
+    }
+  };
+
+  // Validação em tempo real para senha
+  const handleSenhaChange = (value: string) => {
+    setSenha(value);
+    setError("");
+    
+    if (!value) {
+      setErrors((prev) => ({ ...prev, senha: "" }));
+    } else if (!isValidPassword(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        senha: "Senha deve ter no mínimo 6 caracteres",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, senha: "" }));
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!nickname || !senha) {
-      setError("Preencha todos os campos");
+    const validation = validateLogin(nickname, senha);
+    if (!validation.success) {
+      setErrors(validation.errors || {});
+      const errorMsg = validation.errors?.nickname || validation.errors?.senha || "Validação falhou";
+      setError(errorMsg);
       return;
     }
 
     try {
-      const u = { nickname, senha };
-      const res = await api.post(`/usuarios/login`, u);
-      if (res.data?.token) {
-        localStorage.setItem("auth_token", res.data.token);
+      const loginData = { nickname, senha };
+      const response = await api.post(`/usuarios/login`, loginData);
+      if (response.data?.token) {
+        localStorage.setItem("auth_token", response.data.token);
       }
-      if (res.data?.user?._id) {
-        localStorage.setItem("userId", res.data.user._id);
+      if (response.data?.user?._id) {
+        localStorage.setItem("userId", response.data.user._id);
       }
-      setProfile(res.data);
+      setProfile(response.data);
       navigate("/feed");
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Falha no login. Verifique suas credenciais.";
-      setError(msg);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || "Falha no login. Verifique suas credenciais.";
+      setError(errorMessage);
     }
   };
 
   const handleGoogleLogin = () => {
-    // Placeholder para login com Google
     console.log("Login com Google");
     navigate("/feed");
   };
 
-  // Render helpers (separadas por função para padronizar com o Feed)
   const renderLogo = () => (
     <LogoSection>
       <LogoImage src={LogoInfo} alt="InfoScript Logo" />
@@ -91,8 +128,9 @@ const Login: React.FC = () => {
             type="text"
             placeholder="seu usuario"
             value={nickname}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNicknameChange(e.target.value)}
           />
+          {errors.nickname && <ErrorMessage>{errors.nickname}</ErrorMessage>}
         </InputGroup>
         <InputGroup>
           <Label>Senha</Label>
@@ -100,8 +138,9 @@ const Login: React.FC = () => {
             type="password"
             placeholder="sua senha"
             value={senha}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSenhaChange(e.target.value)}
           />
+          {errors.senha && <ErrorMessage>{errors.senha}</ErrorMessage>}
         </InputGroup>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}

@@ -4,6 +4,7 @@ import Feed from "./screen/Feed";
 import Login from "./screen/Login";
 import Profile from "./screen/Profile";
 import Register from "./screen/Register";
+import SearchResults from "./screen/SearchResults";
 import { createGlobalStyle } from "styled-components";
 
 
@@ -38,10 +39,11 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
 } 
 
-export default App;  
+export default App;

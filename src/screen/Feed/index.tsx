@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import Header from "../../components/Header";
-import Colors from "../../constants/Colors";
-import GithubIcon from "../../assets/images/github-mark.png";
-import IconLink from "../../assets/images/icon-link.png";
+import Icon from "@mdi/react";
+import { mdiLink } from "@mdi/js";
+
+import { getCurrentUserName, getCurrentUserYear } from "../../utils/auth";
 import api from "@/services/api";
+
+import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
 import AppAvatar from "../../components/Avatar";
 import NewsList from "../../components/NewsList";
 import Footer from "../../components/Footer";
-import GraduationIconImg from "../../assets/icons/graduation.svg";
 
 import {
   FeedWrapper,
@@ -39,7 +41,6 @@ import {
   ComposerActions,
   ComposerPublishButton,
   ComposerLinkInput,
-  LinkBadge,
   SuggestionsList,
   SuggestionItem,
   PostCard,
@@ -53,13 +54,62 @@ import {
   PostTagRow,
   PostTag,
   PostFooter,
+  PostActions,
   PostDeleteButton,
+  PostLikeButton,
   GithubLink,
   PdfBadge,
   PdfBadgeText,
   NewsCard,
   NewsTitle,
 } from "./styles";
+
+import GithubIcon from "../../assets/images/github-mark.png";
+import IconLink from "../../assets/images/icon-link.png";
+import GraduationIconImg from "../../assets/icons/graduation.svg";
+
+type SavedPost = {
+  id: string;
+  title: string;
+  text: string;
+  tag?: string;
+  author?: string;
+  github?: string | null;
+  link?: string | null;
+  pdf?: string | null;
+  year?: number | string;
+};
+
+const WISHLIST_KEY = "wishlist_posts";
+
+const loadWishlist = (): SavedPost[] => {
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistWishlist = (posts: SavedPost[]) => {
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(posts));
+};
+
+const normalizePost = (post: any): SavedPost => {
+  return {
+    id: String(post._id || post.id),
+    title: post.titulo || post.title || "",
+    text: post.texto || post.text || "",
+    tag: post.tag,
+    author: post.autorNome || post.autor?.nome || post.autorId?.nome || "Usuário",
+    github: post.github || null,
+    link: post.link || null,
+    pdf: post.pdf || null,
+    year: post.anoIngresso || post.autorId?.anoIngresso || post.autor?.anoIngresso,
+  };
+};
 
 const formatLinkLabel = (url: string) => {
   try {
@@ -77,70 +127,91 @@ const formatLinkLabel = (url: string) => {
   }
 };
 
-
 const Feed: React.FC = () => {
-    const [titulo, setTitulo] = useState("");
-    const [texto, setTexto] = useState("");
-    const [tags, setTags] = useState<string[]>([]);
-    const [link, setLink] = useState("");
-    const [linkInput, setLinkInput] = useState("");
-    const [materias, setMaterias] = useState<string[]>([]);
-    const [filteredMaterias, setFilteredMaterias] = useState<string[]>([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [posts, setPosts] = useState<any[]>([]);
-    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search");
 
-    useEffect(() => {
-      const loadMaterias = async () => {
-        try {
-          const res = await api.get("/materias");
-          const payload = res.data;
-          const arr = Array.isArray(payload)
-            ? payload
-            : Array.isArray(payload?.data)
-              ? payload.data
-              : [];
-          const names: string[] = arr
-            .map((m: any) => m?.nome)
-            .filter((v: any) => typeof v === "string" && v.trim().length > 0);
-          const list = names.filter(Boolean);
-          setMaterias(list);
-          // ao carregar, prepara lista completa de matérias
-          const next = list.filter((m) => !tags.includes(m));
-          setFilteredMaterias(next);
-        } catch (e) {
-          // falha silenciosa; mantém sem sugestões
-          console.warn("Falha ao carregar matérias", e);
+  const [titulo, setTitulo] = useState("");
+  const [texto, setTexto] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [link, setLink] = useState("");
+
+  const [materias, setMaterias] = useState<string[]>([]);
+  const [filteredMaterias, setFilteredMaterias] = useState<string[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
+
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+
+  const currentUserName = getCurrentUserName();
+  const userYear = getCurrentUserYear() || new Date().getFullYear();
+
+  useEffect(() => {
+    const loadMaterias = async () => {
+      try {
+        const response = await api.get("/materias");
+        const payload = response.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+        const names: string[] = arr
+          .map((m: any) => m?.nome)
+          .filter((v: any) => typeof v === "string" && v.trim().length > 0);
+        const list = names.filter(Boolean);
+        setMaterias(list);
+        const next = list.filter((m) => !tags.includes(m));
+        setFilteredMaterias(next);
+      } catch (e) {
+        console.warn("Falha ao carregar matérias", e);
+      }
+    };
+    loadMaterias();
+  }, [tags]);
+
+  useEffect(() => {
+    const loadPostagens = async () => {
+      try {
+        setIsLoadingPosts(true);
+        let response;
+
+        if (searchQuery) {
+          response = await api.get(`/postagens/search/geral?q=${encodeURIComponent(searchQuery)}`);
+        } else {
+          response = await api.get("/postagens");
         }
-      };
-      loadMaterias();
-    }, []);
 
-    useEffect(() => {
-      const loadPostagens = async () => {
-        try {
-          setIsLoadingPosts(true);
-          const res = await api.get("/postagens");
-          const payload = res.data;
-          const arr = Array.isArray(payload)
-            ? payload
-            : Array.isArray(payload?.data)
-              ? payload.data
-              : [];
-          setPosts(arr);
-        } catch (e) {
-          console.error("Falha ao carregar postagens", e);
-        } finally {
-          setIsLoadingPosts(false);
-        }
-      };
-      loadPostagens();
-    }, []);
+        const payload = response.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+        setPosts(arr);
+      } catch (e) {
+        console.error("Falha ao carregar postagens", e);
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    };
+    loadPostagens();
+  }, [searchQuery]);
 
-
-    // campo de tag não será digitável, apenas seleção
-
-  // não há mudança por digitação, apenas abrir lista completa ao focar/clicar
+  useEffect(() => {
+    const saved = loadWishlist();
+    if (!saved.length) return;
+    const ids = new Set(saved.map((p) => p.id));
+    setLikedPosts((prev) => {
+      const next: Record<string, boolean> = { ...prev };
+      posts.forEach((p) => {
+        const id = String(p._id || p.id);
+        if (ids.has(id)) next[id] = true;
+      });
+      return next;
+    });
+  }, [posts]);
 
   const onTagFocus = () => {
     const next = materias.filter((m) => !tags.includes(m));
@@ -149,7 +220,6 @@ const Feed: React.FC = () => {
   };
 
   const onTagBlur = () => {
-    // pequeno atraso para permitir clique na sugestão
     setTimeout(() => setShowSuggestions(false), 120);
   };
 
@@ -160,119 +230,101 @@ const Feed: React.FC = () => {
     setShowSuggestions(false);
   };
 
-    const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveTag = (tagToRemove: string) => {
     setTags((prev) => prev.filter((tag) => tag !== tagToRemove));
-    };
+  };
 
-    const handleLinkKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter" && linkInput.trim()) {
-        event.preventDefault();
-        const url = linkInput.trim();
-        setLink(url);
-        setLinkInput("");
-      }
-    };
+  const handlePublicar = async () => {
+    if (!titulo.trim() || !texto.trim() || !tags[0]) {
+      alert("Por favor, preencha título, texto e selecione uma tag.");
+      return;
+    }
 
-    const removeLink = () => {
+    try {
+      const autorId = localStorage.getItem("userId") || "";
+      const payload: any = {
+        titulo: titulo.trim(),
+        texto: texto.trim(),
+        tag: tags[0],
+        autorId,
+        link: link.trim() || null,
+      };
+
+      await api.post("/postagens", payload);
+      
+      alert("Publicação criada com sucesso!");
+
+      setTitulo("");
+      setTexto("");
+      setTags([]);
       setLink("");
-    };
 
-    const handlePublicar = async () => {
-      if (!titulo.trim() || !texto.trim() || !tags[0]) {
-        alert("Por favor, preencha título, texto e selecione uma tag.");
-        return;
-      }
+      const res = await api.get("/postagens");
+      const data = res.data;
+      const arr = Array.isArray(data) 
+        ? data 
+        : Array.isArray(data?.data) 
+          ? data.data 
+          : [];
+      setPosts(arr);
+    } catch (error: any) {
+      console.error("Erro ao publicar:", error);
+      alert(error.response?.data?.message || "Erro ao criar publicação.");
+    }
+  };
 
-      try {
-        const autorId = localStorage.getItem("userId") || "";
-        const payload: any = {
-          titulo: titulo.trim(),
-          texto: texto.trim(),
-          tag: tags[0],
-          autorId,
-        };
-        
-        if (link) {
-          payload.link = link;
-        }
-
-        console.log("Payload enviado:", payload);
-        const response = await api.post("/postagens", payload);
-        console.log("Resposta do POST:", response.data);
-        alert("Publicação criada com sucesso!");
-        setTitulo("");
-        setTexto("");
-        setTags([]);
-        setLink("");
-        setLinkInput("");
-        
-        // Recarregar postagens
-        const res = await api.get("/postagens");
-        console.log("Postagens recebidas:", res.data);
-        const arr = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
-        setPosts(arr);
-      } catch (error: any) {
-        console.error("Erro ao publicar:", error);
-        alert(error.response?.data?.message || "Erro ao criar publicação.");
-      }
-    };
-
-
-    const renderLinkBadge = () => {
-      const isGithub = link.includes("github.com");
-      const label = formatLinkLabel(link);
-      return (
-        <LinkBadge href={link} target="_blank" rel="noopener noreferrer">
-          <img
-            src={isGithub ? GithubIcon : IconLink}
-            alt={isGithub ? "GitHub" : "Link"}
-            style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
-          />
-          {label}
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); removeLink(); }}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: Colors.infoScriptPrimary,
-              marginLeft: 8,
-              cursor: 'pointer'
-            }}
-          >
-            ×
-          </button>
-        </LinkBadge>
-      );
-    };
-
-  const handleDeletePost = (id: number) => {
+  const handleDeletePost = (id: string) => {
     const ok = window.confirm("Tem certeza que deseja excluir este post?");
     if (!ok) return;
-    setPosts((prev) => prev.filter((p) => p.id !== id));
+    setPosts((prev) => prev.filter((p) => (p._id || p.id) !== id));
   };
 
-  const [likedPosts, setLikedPosts] = useState<Record<number, boolean>>({});
-  const togglePostLike = (id: number) => {
-    setLikedPosts(prev => ({ ...prev, [id]: !prev[id] }));
+  const togglePostLike = (id: string) => {
+    setLikedPosts((prev) => {
+      const nextState = { ...prev, [id]: !prev[id] };
+
+      const wishlist = loadWishlist();
+      const isNowLiked = nextState[id];
+
+      if (isNowLiked) {
+        const target = posts.find((p) => String(p._id || p.id) === id);
+        if (target) {
+          const normalized = normalizePost(target);
+          const exists = wishlist.some((p) => p.id === normalized.id);
+          const updated = exists ? wishlist : [...wishlist, normalized];
+          persistWishlist(updated);
+        }
+      } else {
+        const updated = wishlist.filter((p) => p.id !== id);
+        persistWishlist(updated);
+      }
+
+      return nextState;
+    });
   };
 
-  // ---- Render helpers ----
-  const renderHeader = () => <Header />;
+  const renderHeader = () => (
+    <Header
+      currentUser={{
+        name: currentUserName || "Usuário",
+        initial: (currentUserName?.charAt(0) || "U").toUpperCase(),
+      }}
+    />
+  );
 
   const renderUser = () => (
     <UserCard>
       <UserCardHeader>
         <UserAvatarBig>
-          <AppAvatar name="Bianca Siega" size={56} />
+          <AppAvatar name={currentUserName || "Usuário"} size={56} />
         </UserAvatarBig>
         <UserInfo>
-          <UserName>Bianca Siega</UserName>
+          <UserName>{currentUserName || "Usuário"}</UserName>
           <UserSubtitleRow>
             <GraduationIcon>
               <img src={GraduationIconImg} alt="Graduação" />
             </GraduationIcon>
-            <UserSubtitle>Ingresso em 2019</UserSubtitle>
+            <UserSubtitle>Ingresso em {userYear}</UserSubtitle>
           </UserSubtitleRow>
         </UserInfo>
       </UserCardHeader>
@@ -283,170 +335,185 @@ const Feed: React.FC = () => {
     const isFormValid = titulo.trim() !== "" && texto.trim() !== "" && tags.length > 0;
     
     return (
-    <ComposerCard>
-      <ComposerInputTitle 
-        placeholder="Título da publicação" 
-        maxLength={120}
-        value={titulo}
-        onChange={(e) => setTitulo(e.target.value)}
-      />
-      <ComposerInputBody 
-        placeholder="Comece uma publicação" 
-        maxLength={500}
-        value={texto}
-        onChange={(e) => setTexto(e.target.value)}
-      />
-      <ComposerLinksRow>
-        <ComposerLinkInput
-          type="url"
-          placeholder="Adicione um link"
-          value={linkInput}
-          onChange={(e) => setLinkInput(e.target.value)}
-          onKeyDown={handleLinkKeyDown}
-          disabled={Boolean(link)}
-          title={link ? "Remova o link para adicionar outro" : undefined}
+      <ComposerCard>
+        <ComposerInputTitle 
+          placeholder="Título da publicação" 
+          maxLength={120}
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
         />
-        {link && (
-          <React.Fragment key={link}>{renderLinkBadge()}</React.Fragment>
-        )}
-      </ComposerLinksRow>
-      <ComposerTagsRow>
-            <ComposerTagFake>
-              <ComposerTagInput
-                type="text"
-                placeholder={tags.length ? "Tag selecionada" : "Escolha sua tag"}
-                value={tags[0] || ""}
-                readOnly
-                onClick={onTagFocus}
-                onFocus={onTagFocus}
-                onBlur={onTagBlur}
-              />
-            </ComposerTagFake>
-            {showSuggestions && (
-              <SuggestionsList>
-                {filteredMaterias.map((m) => (
-                  <SuggestionItem key={m} onClick={() => addTag(m)}>
-                    {m}
-                  </SuggestionItem>
-                ))}
-              </SuggestionsList>
-            )}
-        {tags.map((tag) => (
-          <ComposerTagPill key={tag}>
-            {tag}
-            <RemoveTagButton
-              type="button"
-              onClick={() => handleRemoveTag(tag)}
-            >
-              ×
-            </RemoveTagButton>
-          </ComposerTagPill>
-        ))}
-      </ComposerTagsRow>
-      <ComposerActions>
-        <div />
-        <ComposerPublishButton 
-          onClick={handlePublicar}
-          disabled={!isFormValid}
-          style={{ opacity: isFormValid ? 1 : 0.5, cursor: isFormValid ? 'pointer' : 'not-allowed' }}
-        >
-          Publicar
-        </ComposerPublishButton>
-      </ComposerActions>
-    </ComposerCard>
+        <ComposerInputBody 
+          placeholder="Comece uma publicação" 
+          maxLength={500}
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+        />
+        <ComposerLinksRow>
+          <ComposerLinkInput
+            type="url"
+            placeholder="Link (opcional)"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+          />
+        </ComposerLinksRow>
+        <ComposerTagsRow>
+          <ComposerTagFake>
+            <ComposerTagInput
+              type="text"
+              placeholder={tags.length ? "Tag selecionada" : "Escolha sua tag"}
+              value={tags[0] || ""}
+              readOnly
+              onClick={onTagFocus}
+              onFocus={onTagFocus}
+              onBlur={onTagBlur}
+            />
+          </ComposerTagFake>
+          {showSuggestions && (
+            <SuggestionsList>
+              {filteredMaterias.map((m) => (
+                <SuggestionItem key={m} onClick={() => addTag(m)}>
+                  {m}
+                </SuggestionItem>
+              ))}
+            </SuggestionsList>
+          )}
+          {tags.map((tag) => (
+            <ComposerTagPill key={tag}>
+              {tag}
+              <RemoveTagButton
+                type="button"
+                onClick={() => handleRemoveTag(tag)}
+              >
+                ×
+              </RemoveTagButton>
+            </ComposerTagPill>
+          ))}
+        </ComposerTagsRow>
+        <ComposerActions>
+          <div />
+          <ComposerPublishButton 
+            onClick={handlePublicar}
+            disabled={!isFormValid}
+            style={{ opacity: isFormValid ? 1 : 0.5, cursor: isFormValid ? 'pointer' : 'not-allowed' }}
+          >
+            Publicar
+          </ComposerPublishButton>
+        </ComposerActions>
+      </ComposerCard>
     );
   };
 
   const renderPosts = () => (
     <>
       {isLoadingPosts && <div style={{ padding: 20, textAlign: 'center' }}>Carregando postagens...</div>}
+      {posts.length === 0 && !isLoadingPosts && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          padding: '40px 40px 20px',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#1f2937',
+            marginBottom: '12px',
+            lineHeight: '1.3'
+          }}>
+            Nenhuma publicação encontrada
+          </h2>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            maxWidth: '480px',
+            lineHeight: '1.6',
+            fontWeight: '400'
+          }}>
+            Seja o primeiro a compartilhar algo interessante!
+          </p>
+        </div>
+      )}
       {posts.map((post) => {
         const postId = post._id || post.id;
         const authorName = post.autorNome;
         const authorYear = post.anoIngresso || new Date().getFullYear();
         
         return (
-        <PostCard key={postId}>
-          <PostDeleteButton
-            type="button"
-            aria-label={`Excluir post ${postId}`}
-            title="Excluir publicação"
-            onClick={() => handleDeletePost(postId)}
-          >
-            <DeleteOutlineIcon style={{ fontSize: 18 }} />
-          </PostDeleteButton>
-          <PostHeader>
-            <PostAvatarSmall>
-              <AppAvatar name={authorName} size={36} />
-            </PostAvatarSmall>
-            <PostHeaderInfo>
-              <PostHeaderName>{authorName}</PostHeaderName>
-              <PostHeaderMeta>
-                <GraduationIcon>
-                  <img src={GraduationIconImg} alt="Graduação" />
-                </GraduationIcon>
-                Ingresso em {authorYear}
-              </PostHeaderMeta>
-            </PostHeaderInfo>
-          </PostHeader>
-          <PostTitle>{post.titulo || post.title}</PostTitle>
-          <PostText>{post.texto || post.text}</PostText>
-          <PostTagRow>
-            <PostTag>{post.tag}</PostTag>
-          </PostTagRow>
-          <PostFooter>
-            <button
-              type="button"
-              aria-label={likedPosts[postId] ? "Descurtir" : "Curtir"}
-              data-liked={likedPosts[postId] ? "true" : "false"}
-              onClick={() => togglePostLike(postId)}
-              style={{
-                background: 'transparent',
-                border: '1px solid #e5e7eb',
-                borderRadius: 6,
-                width: 36,
-                height: 36,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                marginRight: 12,
-                color: likedPosts[postId] ? '#305a93' : '#5FA5CE',
-                transition: 'all 0.2s'
-              }}
-            >
-              {likedPosts[postId] ? (
-                <FavoriteIcon fontSize="small" />
-              ) : (
-                <FavoriteBorderIcon fontSize="small" />
+          <PostCard key={postId}>
+            <PostHeader>
+              <PostAvatarSmall>
+                <AppAvatar name={authorName} size={36} />
+              </PostAvatarSmall>
+              <PostHeaderInfo>
+                <PostHeaderName>{authorName}</PostHeaderName>
+                <PostHeaderMeta>
+                  <GraduationIcon>
+                    <img src={GraduationIconImg} alt="Graduação" />
+                  </GraduationIcon>
+                  Ingresso em {authorYear}
+                </PostHeaderMeta>
+              </PostHeaderInfo>
+            </PostHeader>
+            <PostTitle>{post.titulo || post.title}</PostTitle>
+            <PostText>{post.texto || post.text}</PostText>
+            <PostTagRow>
+              <PostTag>{post.tag}</PostTag>
+            </PostTagRow>
+            <PostFooter>
+              {(post.github || post.link) && (
+                <GithubLink
+                  href={post.github || post.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {(post.github || post.link).includes('github.com') ? (
+                    <img
+                      src={GithubIcon}
+                      alt="GitHub"
+                      style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <Icon path={mdiLink} size={1} style={{ marginRight: 8 }} />
+                  )}
+                  {formatLinkLabel(post.github || post.link)}
+                </GithubLink>
               )}
-            </button>
-            {post.link && (
-              <GithubLink
-                href={post.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src={post.link.includes('github.com') ? GithubIcon : IconLink}
-                  alt={post.link.includes('github.com') ? "GitHub" : "Link"}
-                  style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
-                />
-                {formatLinkLabel(post.link)}
-              </GithubLink>
-            )}
-            {post.pdf && (
-              <PdfBadge>
-                <img
-                  src={IconLink}
-                  alt="link Icon"
-                  style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
-                />
-                <PdfBadgeText>{post.pdf}</PdfBadgeText>
-              </PdfBadge>
-            )}
-          </PostFooter>
-        </PostCard>
+              {post.pdf && (
+                <PdfBadge>
+                  <img
+                    src={IconLink}
+                    alt="PDF Icon"
+                    style={{ width: 20, height: 20, marginRight: 8, objectFit: 'contain' }}
+                  />
+                  <PdfBadgeText>{post.pdf}</PdfBadgeText>
+                </PdfBadge>
+              )}
+              <PostActions>
+                <PostLikeButton
+                  type="button"
+                  aria-label={likedPosts[postId] ? "Descurtir" : "Curtir"}
+                  data-liked={likedPosts[postId] ? "true" : "false"}
+                  onClick={() => togglePostLike(postId)}
+                >
+                  {likedPosts[postId] ? (
+                    <FavoriteIcon fontSize="small" />
+                  ) : (
+                    <FavoriteBorderIcon fontSize="small" />
+                  )}
+                </PostLikeButton>
+                <PostDeleteButton
+                  type="button"
+                  aria-label={`Excluir post ${postId}`}
+                  title="Excluir publicação"
+                  onClick={() => handleDeletePost(postId)}
+                >
+                  <DeleteOutlineIcon fontSize="small" />
+                </PostDeleteButton>
+              </PostActions>
+            </PostFooter>
+          </PostCard>
         );
       })}
     </>

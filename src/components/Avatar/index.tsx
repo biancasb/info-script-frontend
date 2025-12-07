@@ -1,21 +1,27 @@
 import React from "react";
-import BoringAvatar from "boring-avatars";
 
 export interface AppAvatarProps {
   name: string;
   size: number;
   square?: boolean;
-  variant?: "beam" | "marble" | "pixel" | "sunset" | "ring" | "bauhaus";
+  variant?: string;
 }
 
-const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false, variant = "beam" }) => {
+const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false }) => {
+  // Gera um seed baseado no nome para consistência
+  const seed = encodeURIComponent(name);
+  const avatarUrl = `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${seed}`;
+
   return (
-    <BoringAvatar
-      name={name}
-      size={size}
-      square={square}
-      variant={variant}
-      colors={["#5FA5CE", "#89C2E0", "#D2ECFF", "#305A93", "#F4F9FF"]}
+    <img
+      src={avatarUrl}
+      alt={name}
+      width={size}
+      height={size}
+      style={{
+        borderRadius: square ? "8px" : "50%",
+        objectFit: "cover",
+      }}
     />
   );
 };

@@ -333,6 +333,11 @@ export const PublicationTitle = styled.h3`
   color: ${Colors.infoScriptPrimary};
   margin: 0 0 ${Layout.normalize(10)}px 0;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const PublicationDescription = styled.p`
@@ -350,6 +355,7 @@ export const PublicationFooter = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: ${Layout.normalize(12)}px;
 `;
 
 export const LikeButton = styled.button`
@@ -379,6 +385,8 @@ export const AuthorTag = styled.span`
   font-family: ${Typography.fontFamilyRegular};
   font-size: ${Layout.normalize(12)}px;
   color: ${Colors.infoScriptTextInverse};
+  white-space: nowrap;
+  flex-shrink: 0;
 `;
 
 export const GithubLink = styled.a`
