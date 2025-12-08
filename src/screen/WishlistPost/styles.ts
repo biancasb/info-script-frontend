@@ -53,6 +53,9 @@ export const SavedCard = styled.article`
   display: flex;
   flex-direction: column;
   gap: ${Layout.infoScriptNormalize(8)}px;
+  min-height: 340px;
+  max-height: fit-content;
+  justify-content: space-between;
 `;
 
 export const CardHeader = styled.div`
@@ -75,7 +78,7 @@ export const CardMeta = styled.div`
 `;
 
 export const CardPostTitle = styled.h2`
-  margin: 0;
+  margin: ${Layout.infoScriptNormalize(12)}px 0 0 0;
   font-family: ${Typography.infoScriptFontFamilyBold};
   font-size: ${Layout.infoScriptNormalize(18)}px;
   color: ${Colors.infoScriptPrimaryDark};
@@ -100,6 +103,7 @@ export const CardTag = styled.span`
   font-family: ${Typography.infoScriptFontFamilyRegular};
   font-size: ${Layout.infoScriptNormalize(11)}px;
   width: fit-content;
+  margin-bottom: ${Layout.infoScriptNormalize(10)}px;
 `;
 
 export const CardFooter = styled.div`

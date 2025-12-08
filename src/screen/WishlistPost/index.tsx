@@ -4,6 +4,7 @@ import { mdiLink } from "@mdi/js";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import { getCurrentUserName } from "../../utils/auth";
+import api from "@/services/api";
 
 import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
@@ -76,15 +77,49 @@ const WishlistPost: React.FC = () => {
   const currentUserName = getCurrentUserName();
   const currentUserId = localStorage.getItem("userId");
   const [saved, setSaved] = useState<SavedPost[]>([]);
+  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    setSaved(loadSavedPosts(currentUserId || undefined));
+    const validateAndLoadPosts = async () => {
+      const savedPosts = loadSavedPosts(currentUserId || undefined);
+      
+      const validPosts: SavedPost[] = [];
+      
+      for (const post of savedPosts) {
+        try {
+          await api.get(`/postagens/${post.id}`);
+          validPosts.push(post);
+        } catch (error: any) {
+          console.log(`Postagem ${post.id} não existe mais, removendo do wishlist`);
+        }
+      }
+      
+      if (validPosts.length !== savedPosts.length) {
+        savePosts(validPosts, currentUserId || undefined);
+      }
+      
+      setSaved(validPosts);
+    };
+    
+    validateAndLoadPosts();
   }, [currentUserId]);
 
   const handleRemove = (id: string) => {
     const next = saved.filter((p) => p.id !== id);
     setSaved(next);
     savePosts(next, currentUserId || undefined);
+  };
+
+  const toggleExpanded = (id: string) => {
+    setExpandedPosts(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const isEmpty = useMemo(() => saved.length === 0, [saved]);
@@ -118,35 +153,63 @@ const WishlistPost: React.FC = () => {
     );
   };
 
-  const renderCard = (post: SavedPost) => (
+  const renderCard = (post: SavedPost) => {
+    const isExpanded = expandedPosts.has(post.id);
+    const textLength = post.text?.length || 0;
+    const shouldTruncate = textLength > 150;
+    const displayText = shouldTruncate && !isExpanded 
+      ? post.text.slice(0, 150) + '...' 
+      : post.text;
+
+    return (
     <SavedCard key={post.id}>
-      <CardHeader>
-        <AppAvatar name={post.author || "Usuário"} size={36} />
-        <div>
-          <CardTitle>{post.author}</CardTitle>
-          <CardMeta>
-            <img src={GraduationIconImg} alt="Graduação" style={{ width: 14, height: 14, marginRight: 4 }} />
-            {post.year ? ` Ingresso em ${post.year}` : null}
-          </CardMeta>
+      <div>
+        <CardHeader>
+          <AppAvatar name={post.author || "Usuário"} size={36} />
+          <div>
+            <CardTitle>{post.author}</CardTitle>
+            <CardMeta>
+              <img src={GraduationIconImg} alt="Graduação" style={{ width: 14, height: 14, marginRight: 4 }} />
+              {post.year ? ` Ingresso em ${post.year}` : null}
+            </CardMeta>
           </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardPostTitle>{post.title}</CardPostTitle>
-      <CardPostText>{post.text}</CardPostText>
+        <CardPostTitle>{post.title}</CardPostTitle>
+        <CardPostText>
+          {displayText}
+          {shouldTruncate && (
+            <span 
+              onClick={() => toggleExpanded(post.id)}
+              style={{ 
+                color: '#5FA5CE', 
+                cursor: 'pointer', 
+                marginLeft: 4,
+                fontWeight: 600
+              }}
+            >
+              {isExpanded ? 'ver menos' : 'ver mais'}
+            </span>
+          )}
+        </CardPostText>
+      </div>
 
-      {post.tag && <CardTag>{post.tag}</CardTag>}
+      <div>
+        {post.tag && <CardTag>{post.tag}</CardTag>}
 
-      <CardFooter>
-        <CardActions>
-          {renderLink(post)}
-          {renderPdf(post)}
-        </CardActions>
-        <GhostIconButton aria-label="Remover dos salvos" onClick={() => handleRemove(post.id)}>
-          <FavoriteIcon fontSize="small" />
-        </GhostIconButton>
-      </CardFooter>
+        <CardFooter>
+          <CardActions>
+            {renderLink(post)}
+            {renderPdf(post)}
+          </CardActions>
+          <GhostIconButton aria-label="Remover dos salvos" onClick={() => handleRemove(post.id)}>
+            <FavoriteIcon fontSize="small" />
+          </GhostIconButton>
+        </CardFooter>
+      </div>
     </SavedCard>
-  );
+    );
+  };
 
   const renderHeader = () => (
     <Header

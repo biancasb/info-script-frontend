@@ -14,11 +14,11 @@ const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false, varia
   const numericSize = typeof size === 'string' ? parseInt(size, 10) || 40 : size;
 
   const colors = [
-    Colors.infoScriptPrimary,        // #5FA5CE
-    Colors.infoScriptPrimarySoft,    // #e0f5fd
-    Colors.infoScriptAccentBlue,     // #1787c
-    Colors.infoScriptPrimaryDark,    // #305a93
-    Colors.infoScriptAccentSecondary // #3d6689
+    Colors.infoScriptPrimary,
+    Colors.infoScriptPrimarySoft,
+    Colors.infoScriptAccentBlue,
+    Colors.infoScriptPrimaryDark,
+    Colors.infoScriptAccentSecondary
   ];
 
   return (
