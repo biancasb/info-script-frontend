@@ -31,9 +31,6 @@ const getButtonSize = (size?: string) => {
   }
 };
 
-/* ===========================
-   FUNÇÃO PARA VARIANT DO BUTTON
-   =========================== */
 const getButtonVariant = (variant?: string) => {
   switch (variant) {
     case "secondary":
@@ -87,7 +84,7 @@ export const ButtonWrapper = styled.button<ButtonWrapperProps>`
   }
 
   &:disabled {
-    background: ${Colors.infoScriptDisabled};
+    background: ${Colors.infoScriptIconGray};
     color: ${Colors.infoScriptCommonWhite};
     cursor: not-allowed;
     opacity: 0.7;

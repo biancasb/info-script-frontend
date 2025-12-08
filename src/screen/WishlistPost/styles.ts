@@ -31,9 +31,17 @@ export const WishlistDescription = styled.p`
 
 export const CardsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: ${Layout.infoScriptNormalize(16)}px;
   padding-bottom: ${Layout.infoScriptNormalize(40)}px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const SavedCard = styled.article`
