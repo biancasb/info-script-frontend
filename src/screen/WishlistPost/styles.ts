@@ -48,11 +48,11 @@ export const SavedCard = styled.article`
   background: ${Colors.infoScriptCommonWhite};
   border: 1px solid ${Colors.infoScriptBorderLight};
   border-radius: ${Layout.infoScriptNormalize(14)}px;
-  padding: ${Layout.infoScriptNormalize(16)}px;
+  padding: ${Layout.infoScriptNormalize(14)}px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
-  gap: ${Layout.infoScriptNormalize(10)}px;
+  gap: ${Layout.infoScriptNormalize(8)}px;
 `;
 
 export const CardHeader = styled.div`
@@ -72,6 +72,22 @@ export const CardMeta = styled.div`
   font-family: ${Typography.infoScriptFontFamilyRegular};
   font-size: ${Layout.infoScriptNormalize(12)}px;
   color: ${Colors.infoScriptTextSecondary};
+`;
+
+export const CardPostTitle = styled.h2`
+  margin: 0;
+  font-family: ${Typography.infoScriptFontFamilyBold};
+  font-size: ${Layout.infoScriptNormalize(18)}px;
+  color: ${Colors.infoScriptPrimaryDark};
+  line-height: 1.4;
+`;
+
+export const CardPostText = styled.p`
+  margin: 0;
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  font-size: ${Layout.infoScriptNormalize(14)}px;
+  color: ${Colors.infoScriptTextSecondary};
+  line-height: 1.5;
 `;
 
 export const CardTag = styled.span`
@@ -103,16 +119,19 @@ export const CardActions = styled.div`
 
 export const GhostIconButton = styled.button`
   background: transparent;
-  border: 1px solid ${Colors.infoScriptBorderLight};
-  border-radius: ${Layout.infoScriptNormalize(10)}px;
-  padding: ${Layout.infoScriptNormalize(8)}px ${Layout.infoScriptNormalize(12)}px;
-  color: ${Colors.infoScriptTextSecondary};
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${Colors.infoScriptPrimaryDark};
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0;
 
   &:hover {
-    border-color: ${Colors.infoScriptPrimary};
-    color: ${Colors.infoScriptPrimary};
+    transform: scale(1.1);
   }
 `;
 

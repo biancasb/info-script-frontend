@@ -102,34 +102,34 @@ const NewsList: React.FC = () => {
               let chosen: DevToArticle[] = [];
 
               if (todayWithImage.length >= 4) {
-                chosen = todayWithImage.slice(0, 8);
+                chosen = todayWithImage.slice(0, 4);
               } else {
                 chosen = [
                   ...todayWithImage,
                   ...monthWithImage,
                 ];
 
-                if (chosen.length < 8) {
+                if (chosen.length < 4) {
                   const addToday = today.filter((a) => !chosen.includes(a));
                   chosen = [...chosen, ...addToday];
                 }
 
-                if (chosen.length < 8) {
+                if (chosen.length < 4) {
                   const addMonth = month.filter((a) => !chosen.includes(a));
                   chosen = [...chosen, ...addMonth];
                 }
 
-                if (chosen.length < 8) {
+                if (chosen.length < 4) {
                   const addOtherWithImage = withImage.filter((a) => !chosen.includes(a));
                   chosen = [...chosen, ...addOtherWithImage];
                 }
 
-                if (chosen.length < 8) {
+                if (chosen.length < 4) {
                   const others = data.filter((a) => !chosen.includes(a));
                   chosen = [...chosen, ...others];
                 }
 
-                chosen = chosen.slice(0, 8);
+                chosen = chosen.slice(0, 4);
               }
 
               setArticles(chosen.length ? chosen : data);
