@@ -180,7 +180,7 @@ const Feed: React.FC = () => {
         if (searchQuery) {
           response = await api.get(`/postagens/search/geral?q=${encodeURIComponent(searchQuery)}`);
         } else {
-          response = await api.get("/postagens");
+          response = await api.get("/postagens?feedType=geral");
         }
 
         const payload = response.data;
