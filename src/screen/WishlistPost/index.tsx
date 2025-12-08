@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiLink } from "@mdi/js";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import { getCurrentUserName } from "../../utils/auth";
 
@@ -20,6 +21,8 @@ import {
   CardHeader,
   CardTitle,
   CardMeta,
+  CardPostTitle,
+  CardPostText,
   CardFooter,
   CardTag,
   CardActions,
@@ -122,7 +125,8 @@ const WishlistPost: React.FC = () => {
           </div>
       </CardHeader>
 
-      <p style={{ margin: "8px 0 12px", color: "#4b5563", lineHeight: 1.5 }}>{post.text}</p>
+      <CardPostTitle>{post.title}</CardPostTitle>
+      <CardPostText>{post.text}</CardPostText>
 
       {post.tag && <CardTag>{post.tag}</CardTag>}
 
@@ -132,7 +136,7 @@ const WishlistPost: React.FC = () => {
           {renderPdf(post)}
         </CardActions>
         <GhostIconButton aria-label="Remover dos salvos" onClick={() => handleRemove(post.id)}>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Remover</span>
+          <FavoriteIcon fontSize="small" />
         </GhostIconButton>
       </CardFooter>
     </SavedCard>

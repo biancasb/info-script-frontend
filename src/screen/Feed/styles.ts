@@ -637,6 +637,7 @@ export const NewsCard = styled.div`
   padding: ${Layout.infoScriptNormalize(20)}px;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
   min-height: 120px;
+  margin-bottom: ${Layout.infoScriptNormalize(32)}px;
 `;
 
 export const NewsTitle = styled.h2`
