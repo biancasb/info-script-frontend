@@ -217,7 +217,8 @@ export const UserAvatarBig = styled.div`
 export const UserName = styled.div`
   font-family: ${Typography.infoScriptFontFamilyBold};
   font-size: ${Layout.infoScriptNormalize(16)}px;
-  color: ${Colors.infoScriptPrimary};
+  color: ${Colors.infoScriptPrimaryDark};
+  font-weight: bold;
 `;
 
 export const UserSubtitleRow = styled.div`
