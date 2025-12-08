@@ -139,19 +139,11 @@ const SearchResults: React.FC = () => {
 
   const renderPost = (post: any) => {
     const postId = post._id || post.id;
-    const authorName = post.autorId?.nome || post.autor?.nome || post.author || "Usuário Anônimo";
-    const authorYear = post.autorId?.anoIngresso || post.autor?.anoIngresso || post.year || new Date().getFullYear();
+    const authorName = post.autorNome || post.autorId?.nome || post.autor?.nome || post.author || "Usuário Anônimo";
+    const authorYear = post.anoIngresso || post.autorId?.anoIngresso || post.autor?.anoIngresso || post.year || new Date().getFullYear();
 
     return (
       <PostCard key={postId}>
-        <PostDeleteButton
-          type="button"
-          aria-label={`Excluir post ${postId}`}
-          title="Excluir publicação"
-          onClick={() => handleDeletePost(postId)}
-        >
-          <DeleteOutlineIcon style={{ fontSize: 18 }} />
-        </PostDeleteButton>
         <PostHeader>
           <PostAvatarSmall>
             <AppAvatar name={authorName} size={36} />
@@ -172,32 +164,6 @@ const SearchResults: React.FC = () => {
           <PostTag>{post.tag}</PostTag>
         </PostTagRow>
         <PostFooter>
-          <button
-            type="button"
-            aria-label={likedPosts[postId] ? "Descurtir" : "Curtir"}
-            data-liked={likedPosts[postId] ? "true" : "false"}
-            onClick={() => togglePostLike(postId)}
-            style={{
-              background: 'transparent',
-              border: '1px solid #e5e7eb',
-              borderRadius: 6,
-              width: 36,
-              height: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              marginRight: 12,
-              color: likedPosts[postId] ? '#305a93' : '#5FA5CE',
-              transition: 'all 0.2s'
-            }}
-          >
-            {likedPosts[postId] ? (
-              <FavoriteIcon fontSize="small" />
-            ) : (
-              <FavoriteBorderIcon fontSize="small" />
-            )}
-          </button>
           {(post.github || post.link) && (
             <GithubLink
               href={post.github || post.link}
@@ -222,6 +188,32 @@ const SearchResults: React.FC = () => {
               <PdfBadgeText>{post.pdf}</PdfBadgeText>
             </PdfBadge>
           )}
+          <button
+            type="button"
+            aria-label={likedPosts[postId] ? "Descurtir" : "Curtir"}
+            data-liked={likedPosts[postId] ? "true" : "false"}
+            onClick={() => togglePostLike(postId)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 6,
+              width: 36,
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              marginLeft: 'auto',
+              color: likedPosts[postId] ? '#305a93' : '#9ca3af',
+              transition: 'all 0.2s'
+            }}
+          >
+            {likedPosts[postId] ? (
+              <FavoriteIcon fontSize="small" />
+            ) : (
+              <FavoriteBorderIcon fontSize="small" />
+            )}
+          </button>
         </PostFooter>
       </PostCard>
     );

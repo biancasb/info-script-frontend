@@ -153,7 +153,11 @@ const Register: React.FC = () => {
         navigate("/login");
       }, 500);
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || "Falha ao criar conta. Verifique os dados e tente novamente.";
+      const apiError = error?.response?.data?.error || error?.response?.data?.message;
+      const isConflict = error?.response?.status === 409;
+      const errorMessage = isConflict
+        ? "Este nome de usuário já está em uso. Escolha outro."
+        : apiError || "Falha ao criar conta. Verifique os dados e tente novamente.";
       setError(errorMessage);
     }
   };

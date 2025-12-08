@@ -80,11 +80,15 @@ type SavedPost = {
   year?: number | string;
 };
 
-const WISHLIST_KEY = "wishlist_posts";
+const getWishlistKey = (userId?: string) => {
+  if (!userId) return "wishlist_posts_anonymous";
+  return `wishlist_posts_${userId}`;
+};
 
-const loadWishlist = (): SavedPost[] => {
+const loadWishlist = (userId?: string): SavedPost[] => {
   try {
-    const raw = localStorage.getItem(WISHLIST_KEY);
+    const key = getWishlistKey(userId);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -93,8 +97,9 @@ const loadWishlist = (): SavedPost[] => {
   }
 };
 
-const persistWishlist = (posts: SavedPost[]) => {
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(posts));
+const persistWishlist = (posts: SavedPost[], userId?: string) => {
+  const key = getWishlistKey(userId);
+  localStorage.setItem(key, JSON.stringify(posts));
 };
 
 const normalizePost = (post: any): SavedPost => {
@@ -145,6 +150,7 @@ const Feed: React.FC = () => {
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
 
   const currentUserName = getCurrentUserName();
+  const currentUserId = localStorage.getItem("userId");
   const userYear = getCurrentUserYear() || new Date().getFullYear();
 
   useEffect(() => {
@@ -200,7 +206,7 @@ const Feed: React.FC = () => {
   }, [searchQuery]);
 
   useEffect(() => {
-    const saved = loadWishlist();
+    const saved = loadWishlist(currentUserId || undefined);
     if (!saved.length) return;
     const ids = new Set(saved.map((p) => p.id));
     setLikedPosts((prev) => {
@@ -211,7 +217,7 @@ const Feed: React.FC = () => {
       });
       return next;
     });
-  }, [posts]);
+  }, [posts, currentUserId]);
 
   const onTagFocus = () => {
     const next = materias.filter((m) => !tags.includes(m));
@@ -259,7 +265,7 @@ const Feed: React.FC = () => {
       setTags([]);
       setLink("");
 
-      const res = await api.get("/postagens");
+      const res = await api.get("/postagens?feedType=geral");
       const data = res.data;
       const arr = Array.isArray(data) 
         ? data 
@@ -273,17 +279,26 @@ const Feed: React.FC = () => {
     }
   };
 
-  const handleDeletePost = (id: string) => {
+  const handleDeletePost = async (id: string) => {
     const ok = window.confirm("Tem certeza que deseja excluir este post?");
     if (!ok) return;
-    setPosts((prev) => prev.filter((p) => (p._id || p.id) !== id));
+    
+    try {
+      await api.delete(`/postagens/${id}`, {
+        data: { autorId: currentUserId }
+      });
+      setPosts((prev) => prev.filter((p) => (p._id || p.id) !== id));
+    } catch (error: any) {
+      console.error("Erro ao deletar post:", error);
+      alert("Erro ao deletar publicação");
+    }
   };
 
   const togglePostLike = (id: string) => {
     setLikedPosts((prev) => {
       const nextState = { ...prev, [id]: !prev[id] };
 
-      const wishlist = loadWishlist();
+      const wishlist = loadWishlist(currentUserId || undefined);
       const isNowLiked = nextState[id];
 
       if (isNowLiked) {
@@ -292,11 +307,11 @@ const Feed: React.FC = () => {
           const normalized = normalizePost(target);
           const exists = wishlist.some((p) => p.id === normalized.id);
           const updated = exists ? wishlist : [...wishlist, normalized];
-          persistWishlist(updated);
+          persistWishlist(updated, currentUserId || undefined);
         }
       } else {
         const updated = wishlist.filter((p) => p.id !== id);
-        persistWishlist(updated);
+        persistWishlist(updated, currentUserId || undefined);
       }
 
       return nextState;
@@ -503,14 +518,16 @@ const Feed: React.FC = () => {
                     <FavoriteBorderIcon fontSize="small" />
                   )}
                 </PostLikeButton>
-                <PostDeleteButton
-                  type="button"
-                  aria-label={`Excluir post ${postId}`}
-                  title="Excluir publicação"
-                  onClick={() => handleDeletePost(postId)}
-                >
-                  <DeleteOutlineIcon fontSize="small" />
-                </PostDeleteButton>
+                {post.autorId === currentUserId && (
+                  <PostDeleteButton
+                    type="button"
+                    aria-label={`Excluir post ${postId}`}
+                    title="Excluir publicação"
+                    onClick={() => handleDeletePost(postId)}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </PostDeleteButton>
+                )}
               </PostActions>
             </PostFooter>
           </PostCard>

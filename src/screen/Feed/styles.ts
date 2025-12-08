@@ -322,7 +322,7 @@ export const ComposerLinkInput = styled.input`
   font-size: ${Layout.infoScriptNormalize(12)}px;
   font-family: ${Typography.infoScriptFontFamilyRegular};
   color: ${Colors.infoScriptTextPrimary};
-  width: 280px;
+  width: 200px;
 
   &::placeholder {
     color: ${Colors.infoScriptTextSecondary};
@@ -375,7 +375,7 @@ export const ComposerTagInput = styled.input`
   font-size: ${Layout.infoScriptNormalize(12)}px;
   font-family: ${Typography.infoScriptFontFamilyRegular};
   color: ${Colors.infoScriptTextPrimary};
-  width: 140px;
+  width: 200px;
 
   &::placeholder {
     color: ${Colors.infoScriptTextSecondary};
@@ -494,8 +494,24 @@ export const PostDeleteButton = styled.button`
   }
 `;
 
-export const PostLikeButton = styled(PostDeleteButton)`
+export const PostLikeButton = styled.button`
+  background: transparent;
+  border: none;
+  width: ${Layout.infoScriptNormalize(32)}px;
+  height: ${Layout.infoScriptNormalize(32)}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
   color: ${Colors.infoScriptIconMedium};
+  transition: color 0.2s ease, transform 0.2s ease;
+
+  svg {
+    display: block;
+    width: ${Layout.infoScriptNormalize(18)}px;
+    height: ${Layout.infoScriptNormalize(18)}px;
+  }
 
   &[data-liked="true"] {
     color: ${Colors.infoScriptPrimaryDark};
@@ -503,6 +519,10 @@ export const PostLikeButton = styled(PostDeleteButton)`
 
   &:hover {
     color: ${Colors.infoScriptPrimaryDark};
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 

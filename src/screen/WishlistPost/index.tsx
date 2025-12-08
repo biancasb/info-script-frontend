@@ -50,11 +50,15 @@ type SavedPost = {
   year?: number | string;
 };
 
-const STORAGE_KEY = "wishlist_posts";
+const getStorageKey = (userId?: string) => {
+  if (!userId) return "wishlist_posts_anonymous";
+  return `wishlist_posts_${userId}`;
+};
 
-const loadSavedPosts = (): SavedPost[] => {
+const loadSavedPosts = (userId?: string): SavedPost[] => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(userId);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -63,22 +67,24 @@ const loadSavedPosts = (): SavedPost[] => {
   }
 };
 
-const savePosts = (posts: SavedPost[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+const savePosts = (posts: SavedPost[], userId?: string) => {
+  const key = getStorageKey(userId);
+  localStorage.setItem(key, JSON.stringify(posts));
 };
 
 const WishlistPost: React.FC = () => {
   const currentUserName = getCurrentUserName();
+  const currentUserId = localStorage.getItem("userId");
   const [saved, setSaved] = useState<SavedPost[]>([]);
 
   useEffect(() => {
-    setSaved(loadSavedPosts());
-  }, []);
+    setSaved(loadSavedPosts(currentUserId || undefined));
+  }, [currentUserId]);
 
   const handleRemove = (id: string) => {
     const next = saved.filter((p) => p.id !== id);
     setSaved(next);
-    savePosts(next);
+    savePosts(next, currentUserId || undefined);
   };
 
   const isEmpty = useMemo(() => saved.length === 0, [saved]);

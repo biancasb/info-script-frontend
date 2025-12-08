@@ -47,8 +47,42 @@ import GraduationIconImg from "../../assets/icons/graduation.svg";
 import GithubIcon from "../../assets/images/github-mark.png";
 import PdfIcon from "../../assets/images/pdf.png";
 
+type SavedPost = {
+  id: string;
+  title: string;
+  text: string;
+  tag?: string;
+  author?: string;
+  github?: string | null;
+  link?: string | null;
+  pdf?: string | null;
+  year?: number | string;
+};
+
+const getWishlistKey = (userId?: string) => {
+  if (!userId) return "wishlist_posts_anonymous";
+  return `wishlist_posts_${userId}`;
+};
+
+const loadWishlist = (userId?: string): SavedPost[] => {
+  try {
+    const key = getWishlistKey(userId);
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistWishlist = (posts: SavedPost[], userId?: string) => {
+  const key = getWishlistKey(userId);
+  localStorage.setItem(key, JSON.stringify(posts));
+};
+
 const Profile: React.FC = () => {
-  const [likedById, setLikedById] = useState<Record<number, boolean>>({});
+  const [likedById, setLikedById] = useState<Record<string, boolean>>({});
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [publications, setPublications] = useState<any[]>([]);
@@ -58,6 +92,7 @@ const Profile: React.FC = () => {
   const currentUserUsername = getCurrentUsername();
   const currentUserName = getCurrentUserName();
   const currentUserYear = getCurrentUserYear();
+  const currentUserId = localStorage.getItem("userId");
   const isOwnProfile = !username || username?.toLowerCase() === currentUserUsername?.toLowerCase();
 
   console.log("Profile Debug:", {
@@ -98,7 +133,7 @@ const Profile: React.FC = () => {
             ? payload.data
             : [];
         const mapped = arr.map((post: any) => ({
-          id: post._id || post.id,
+          id: String(post._id || post.id),
           title: post.titulo || post.title,
           description: post.texto || post.text,
           tag: post.tag,
@@ -108,6 +143,7 @@ const Profile: React.FC = () => {
           github: post.github || null,
           pdf: post.pdf || null,
           link: post.link || null,
+          year: post.anoIngresso || userProfile?.anoIngresso || currentUserYear,
         }));
         setPublications(mapped);
       } catch (e) {
@@ -117,8 +153,55 @@ const Profile: React.FC = () => {
     loadUserPublications();
   }, [username, currentUserUsername, userProfile?.nome]);
 
-  const toggleLike = (id: number) => {
-    setLikedById((prev) => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    const saved = loadWishlist(currentUserId || undefined);
+    if (!saved.length) return;
+    const ids = new Set(saved.map((p) => String(p.id)));
+    setLikedById((prev) => {
+      const next: Record<string, boolean> = { ...prev };
+      publications.forEach((pub) => {
+        const id = String(pub.id);
+        if (ids.has(id)) next[id] = true;
+      });
+      return next;
+    });
+  }, [publications, currentUserId]);
+
+  const normalizePublication = (pub: any): SavedPost => ({
+    id: String(pub.id),
+    title: pub.title || "",
+    text: pub.description || "",
+    tag: pub.tag,
+    author: pub.author || userProfile?.nome || currentUserName || "Usuário",
+    github: pub.github || null,
+    link: pub.link || null,
+    pdf: pub.pdf || null,
+    year: pub.year || userProfile?.anoIngresso || currentUserYear,
+  });
+
+  const toggleLike = (id: string | number) => {
+    const key = String(id);
+    setLikedById((prev) => {
+      const nextState = { ...prev, [key]: !prev[key] };
+
+      const wishlist = loadWishlist(currentUserId || undefined);
+      const isNowLiked = nextState[key];
+
+      if (isNowLiked) {
+        const target = publications.find((p) => String(p.id) === key);
+        if (target) {
+          const normalized = normalizePublication(target);
+          const exists = wishlist.some((p) => String(p.id) === normalized.id);
+          const updated = exists ? wishlist : [...wishlist, normalized];
+          persistWishlist(updated, currentUserId || undefined);
+        }
+      } else {
+        const updated = wishlist.filter((p) => String(p.id) !== key);
+        persistWishlist(updated, currentUserId || undefined);
+      }
+
+      return nextState;
+    });
   };
 
   const handleTagClick = (tag: string) => {
@@ -282,20 +365,23 @@ const Profile: React.FC = () => {
     );
   };
 
-  const renderLikeButton = (id: number) => (
+  const renderLikeButton = (id: string | number) => {
+    const key = String(id);
+    return (
     <LikeButton
       type="button"
-      aria-label={likedById[id] ? "Descurtir" : "Curtir"}
-      data-liked={likedById[id] ? "true" : "false"}
-      onClick={() => toggleLike(id)}
+      aria-label={likedById[key] ? "Descurtir" : "Curtir"}
+      data-liked={likedById[key] ? "true" : "false"}
+      onClick={() => toggleLike(key)}
     >
-      {likedById[id] ? (
+      {likedById[key] ? (
         <FavoriteIcon fontSize="small" />
       ) : (
         <FavoriteBorderIcon fontSize="small" />
       )}
     </LikeButton>
-  );
+    );
+  };
 
   return (
     <ProfileWrapper>

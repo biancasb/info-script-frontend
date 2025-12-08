@@ -127,32 +127,46 @@ export const SearchInput = styled.input`
 
 export const SearchHistoryContainer = styled.div`
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
   background: ${Colors.infoScriptCommonWhite};
-  border-radius: 0 0 999px 999px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-  z-index: 10;
+  border-radius: ${Layout.infoScriptNormalize(12)}px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
   overflow: hidden;
-  margin-top: -8px;
+  border: 1px solid ${Colors.infoScriptBorderLight};
 `;
 
 export const SearchHistoryItem = styled.div`
-  padding: ${Layout.infoScriptNormalize(12)}px ${Layout.infoScriptNormalize(16)}px;
+  padding: ${Layout.infoScriptNormalize(14)}px ${Layout.infoScriptNormalize(20)}px;
   cursor: pointer;
   font-size: ${Layout.infoScriptNormalize(14)}px;
-  color: ${Colors.infoScriptTextSecondary};
+  font-family: ${Typography.infoScriptFontFamilyRegular};
+  color: ${Colors.infoScriptTextPrimary};
   transition: background 0.2s;
-  border-bottom: 1px solid ${Colors.infoScriptBorderLight};
+  display: flex;
+  align-items: center;
+  gap: ${Layout.infoScriptNormalize(12)}px;
 
-  &:last-child {
-    border-bottom: none;
+  svg {
+    color: ${Colors.infoScriptIconGray};
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &:hover {
-    background: ${Colors.infoScriptPrimarySoft};
-    color: ${Colors.infoScriptPrimary};
+    background: ${Colors.infoScriptBackgroundLight};
+    
+    svg {
+      color: ${Colors.infoScriptPrimary};
+    }
   }
 `;
 

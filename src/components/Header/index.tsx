@@ -116,7 +116,8 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
             key={index}
             onClick={() => handleHistoryClick(term)}
           >
-            🔍 {term}
+            <Icon path={mdiMagnify} size={0.7} />
+            <span>{term}</span>
           </SearchHistoryItem>
         ))}
       </SearchHistoryContainer>
