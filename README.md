@@ -1,6 +1,6 @@
 # InfoScript Frontend
 
-Rede social acadêmica para compartilhar projetos, pesquisas e materiais entre estudantes.
+Rede social acadêmica para estudantes de Informática Biomédica compartilharem projetos, pesquisas e materiais.
 
 ## Desenvolvedoras
 
@@ -52,13 +52,24 @@ VITE_API_URL=http://localhost:3000
 
 ```
 src/
-├── components/        # Avatar, Header, Footer, Drawer, etc.
-├── constants/         # Colors, Layout, Typography
-├── screen/            # Account, Feed, Login, Profile, Register, SearchResults, WishlistPost
-├── services/          # api.ts (Axios)
-├── utils/             # auth, validators
-├── App.tsx            # Rotas
-└── main.tsx           # Bootstrap
+├── components/              # Blocos reutilizáveis
+│   ├── Avatar/              # Avatar de usuário
+│   ├── Buttom/              # Botões customizados
+│   ├── Drawer/              # Menu lateral
+│   ├── Footer/              # Rodapé
+│   ├── Header/              # Cabeçalho e busca
+│   ├── NewsList/            # Lista de notícias
+│   ├── PageContainer/       # Wrapper de página
+│   ├── ProfileDropdown/     # Menu do usuário logado
+│   └── Social/              # Links sociais (GitHub etc.)
+└── screen/                  # Páginas
+    ├── Account/             # Configurações de conta
+    ├── Feed/                # Feed principal
+    ├── Login/               # Tela de login
+    ├── Profile/             # Perfil de usuário
+    ├── Register/            # Cadastro
+    ├── SearchResults/       # Resultados de busca
+    └── WishlistPost/        # Posts salvos
 ```
 
 ## Como Funciona
@@ -73,6 +84,3 @@ src/
 - Commit: `git commit -m "Minha feature"`
 - Push e abra um PR para `staging`
 
-## Suporte
-
-Dúvidas? Abra uma issue ou contate as desenvolvedoras.
