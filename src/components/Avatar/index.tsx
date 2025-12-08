@@ -1,38 +1,45 @@
 
 import React from "react";
+import Avatar from "boring-avatars";
 import Colors from "@/constants/Colors";
+
 export interface AppAvatarProps {
   name: string;
   size: number | string;
   square?: boolean;
-  variant?: string;
+  variant?: "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus";
 }
 
-const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false }) => {
+const AppAvatar: React.FC<AppAvatarProps> = ({ name, size, square = false, variant = "beam" }) => {
   const numericSize = typeof size === 'string' ? parseInt(size, 10) || 40 : size;
-  const initial = (name?.trim()?.charAt(0) || '?').toUpperCase();
 
-  const dimension = `${numericSize}px`;
-  const fontSize = `${Math.max(Math.round(numericSize * 0.45), 12)}px`;
+  const colors = [
+    Colors.infoScriptPrimary,        // #5FA5CE
+    Colors.infoScriptPrimarySoft,    // #e0f5fd
+    Colors.infoScriptAccentBlue,     // #1787c
+    Colors.infoScriptPrimaryDark,    // #305a93
+    Colors.infoScriptAccentSecondary // #3d6689
+  ];
 
   return (
     <div
       style={{
-        width: dimension,
-        height: dimension,
+        width: `${numericSize}px`,
+        height: `${numericSize}px`,
         borderRadius: square ? '12%' : '50%',
-        backgroundColor: Colors.infoScriptPrimarySoft,
-        color: Colors.infoScriptPrimaryDark,
+        overflow: 'hidden',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontWeight: 700,
-        fontSize,
-        lineHeight: 1,
-        userSelect: 'none',
       }}
     >
-      {initial}
+      <Avatar
+        size={numericSize}
+        name={name || "User"}
+        variant={variant}
+        colors={colors}
+        square={square}
+      />
     </div>
   );
 };

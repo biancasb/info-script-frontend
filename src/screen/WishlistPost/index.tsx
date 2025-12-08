@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 import PageContainer from "../../components/PageContainer";
 import Footer from "../../components/Footer";
 import AppAvatar from "../../components/Avatar";
+import GraduationIconImg from "../../assets/icons/graduation.svg";
 
 import {
   WishlistWrapper,
@@ -113,12 +114,12 @@ const WishlistPost: React.FC = () => {
       <CardHeader>
         <AppAvatar name={post.author || "Usuário"} size={36} />
         <div>
-          <CardTitle>{post.title}</CardTitle>
+          <CardTitle>{post.author}</CardTitle>
           <CardMeta>
-            {post.author || "Usuário"}
-            {post.year ? ` · Ingresso em ${post.year}` : null}
+            <img src={GraduationIconImg} alt="Graduação" style={{ width: 14, height: 14, marginRight: 4 }} />
+            {post.year ? ` Ingresso em ${post.year}` : null}
           </CardMeta>
-        </div>
+          </div>
       </CardHeader>
 
       <p style={{ margin: "8px 0 12px", color: "#4b5563", lineHeight: 1.5 }}>{post.text}</p>

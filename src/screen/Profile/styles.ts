@@ -151,7 +151,7 @@ export const ProfileInfo = styled.div`
 export const ProfileName = styled.h1`
   font-family: ${Typography.infoScriptFontFamilyBold};
   font-size: ${Layout.infoScriptNormalize(32)}px;
-  color: ${Colors.infoScriptPrimary};
+  color: ${Colors.infoScriptPrimaryDark};
   margin: 0 0 ${Layout.infoScriptNormalize(4)}px 0;
 `;
 
@@ -179,7 +179,7 @@ export const GraduationIcon = styled.span`
 export const ProfileSubtitle = styled.span`
   font-family: ${Typography.infoScriptFontFamilyRegular};
   font-size: ${Layout.infoScriptNormalize(14)}px;
-  color: ${Colors.infoScriptTextPrimary};
+  color: ${Colors.infoScriptPrimary};
 `;
 
 export const FollowButton = styled.button`
@@ -346,7 +346,7 @@ export const PublicationContent = styled.div`
 export const PublicationTitle = styled.h3`
   font-family: ${Typography.infoScriptFontFamilyBold};
   font-size: ${Layout.infoScriptNormalize(16)}px;
-  color: ${Colors.infoScriptPrimary};
+  color: ${Colors.infoScriptPrimaryDark};
   margin: 0 0 ${Layout.infoScriptNormalize(10)}px 0;
   line-height: 1.3;
   display: -webkit-box;
@@ -359,7 +359,7 @@ export const PublicationTitle = styled.h3`
 export const PublicationDescription = styled.p`
   font-family: ${Typography.infoScriptFontFamilyRegular};
   font-size: ${Layout.infoScriptNormalize(13)}px;
-  color: ${Colors.infoScriptTextPrimary};
+  color: ${Colors.infoScriptTextSecondary};
   line-height: 1.5;
   margin: 0;
   flex: 1 1 auto;
